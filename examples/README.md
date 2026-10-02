@@ -34,6 +34,6 @@ The `keywords/` subdirectory is intentionally excluded from the normal top-level
 bash scripts/run-keyword-demos.sh
 ```
 
-The keyword suite additionally covers `defer/recover`, private/shared actors, async/await, callable-local interfaces, pointerless `borrow/copy/take/share`, and `is`/`with` trait composition. Feature-stack examples stay pinned until their compiler work lands on the default source revision.
+The keyword suite additionally covers `defer/recover`, private/shared actors, async/await, callable-local interfaces, pointerless `borrow/copy/take/share`, four-way class/struct/trait/interface parameter boundaries, canonical `as` declaration bodies, and `is`/`with` trait composition. Feature-stack examples stay pinned until their compiler work lands on the default source revision.
 
 See `keywords/README.md` and `../docs/keyword-contracts.md`.
