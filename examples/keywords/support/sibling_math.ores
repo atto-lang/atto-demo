@@ -1,0 +1,7 @@
+namespace sibling_math;
+
+define module arithmetic
+  pub fnc add(int a, int b) => int {
+    return a + b;
+  }
+end
