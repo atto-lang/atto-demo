@@ -21,7 +21,11 @@ This repository is intentionally a **demo consumer** of the language implementat
 - custom iterators and scheduler safepoints;
 - finite tuple and structural-record return types;
 - returned-value destructuring and reusable `_` discard patterns;
-- inheritance across module-qualified classes.
+- inheritance across module-qualified classes;
+- generic functions, classes, interfaces, explicit specialization, and inference;
+- generic inheritance with concrete field/method substitution;
+- logical `&&`, `||`, and `^^` with short-circuit semantics;
+- integer bitwise `~`, `&`, `|`, `^`, `<<`, `>>`, and `>>>`.
 
 The stable examples stay pinned to the root `SOURCE_REF`. Experimental keyword contracts for `defer`, `recover`, `lex`, `nlex`, `gpu`, `actor`, `async`, and `await` live separately under `examples/keywords/` because those features currently span stacked source branches.
 
@@ -82,6 +86,10 @@ examples/
   08_typed_returns_and_destructuring.ores
   09_destructure_discards.ores
   10_inheritance_and_collections.ores
+  11_generics_and_inference.ores
+  12_generic_inheritance.ores
+  13_logical_operators.ores
+  14_bitwise_operators.ores
   README.md
   keywords/
     README.md
@@ -128,7 +136,7 @@ See `docs/callables.md` for the exact split.
 
 Set `ORESLANG_SOURCE_DIR` when you intentionally want to test a local compiler/runtime branch rather than the pinned demo baseline.
 
-The current pin is the merge revision for the typed returned-result/destructuring work. That exact source tree was independently verified under GraalVM 25.3 / Java 25 with `mvn verify`: 78 tests passed with zero failures, including all returned-destructuring tests.
+The current pin is the merge revision for the generics and logical/bitwise-operator hardening work. The corresponding PR head was independently verified under GraalVM 25.3 / Java 25 with `mvn verify`: 184 tests passed with zero failures, including all 16 focused generics/operator tests, plus native AOT, native hybrid, and polyglot-isolate validation.
 
 ## Current implementation boundary
 
@@ -149,7 +157,7 @@ PASS
 
 ...
 
-11/11 demos passed
+15/15 demos passed
 ```
 
 Known Graal/Truffle `sun.misc.Unsafe` deprecation lines are suppressed only after a demo succeeds; unrelated stderr is still printed. Set `ORESLANG_SHOW_RUNTIME_WARNINGS=1` to show the full runtime warning stream.
