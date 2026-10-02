@@ -12,3 +12,7 @@ source-ref:
 
 test-nlex:
     bash scripts/test-nlex.sh
+
+
+test-actors:
+    bash scripts/test-actors.sh
