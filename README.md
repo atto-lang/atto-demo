@@ -23,9 +23,15 @@ This repository is intentionally a **demo consumer** of the language implementat
 - returned-value destructuring and reusable `_` discard patterns;
 - inheritance across module-qualified classes.
 
-The runtime also already has actor isolation and deny-by-default isolate capability machinery. Those are documented here, but this demo does **not** invent actor source syntax that is not yet in the grammar.
+The stable examples stay pinned to the root `SOURCE_REF`. Experimental keyword contracts for `defer`, `recover`, `lex`, `nlex`, `gpu`, `actor`, `async`, and `await` live separately under `examples/keywords/` because those features currently span stacked source branches.
 
-Likewise, `nlex` is intentionally not demonstrated: it is not currently a language keyword. It should only be added if compiler/runtime measurements show a real non-tradeoff win from closure-environment elision.
+Run the audited keyword matrix with:
+
+```bash
+bash scripts/run-keyword-demos.sh
+```
+
+Each keyword case pins its own exact source commit and declares whether it must run successfully or fail closed for a specific reason. See `docs/keyword-contracts.md`.
 
 ## Quick start
 
@@ -77,14 +83,22 @@ examples/
   09_destructure_discards.ores
   10_inheritance_and_collections.ores
   README.md
+  keywords/
+    README.md
+    manifest.tsv
+    01_defer.ores
+    ...
+    11_invalid_lex_nlex.ores
 
 docs/
   callables.md
+  keyword-contracts.md
   runtime-boundaries.md
 
 scripts/
   run.sh
   run-all.sh
+  run-keyword-demos.sh
 
 SOURCE_REF
 justfile
