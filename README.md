@@ -15,7 +15,12 @@ This repository is intentionally a **demo consumer** of the language implementat
 - classes and receiver methods;
 - explicit `return`;
 - `const`, `val`, and `let`;
-- complex numbers, arrays, objects, tuples, and ordinary control flow.
+- complex numbers, arrays, objects, tuples, and ordinary control flow;
+- callable-scoped LIFO `defer`;
+- explicit callable-producing defer forms such as `defer file.Close()`;
+- self-invoking defer producers;
+- `break` and `continue` in classic and for-of loops;
+- `try/finally` interaction with loop control and deferred cleanup.
 
 The runtime also already has actor isolation and deny-by-default isolate capability machinery. Those are documented here, but this demo does **not** invent actor source syntax that is not yet in the grammar.
 
@@ -64,6 +69,10 @@ examples/
   02_structural_types.ores
   03_classes_and_methods.ores
   04_control_flow.ores
+  05_defer_lifo.ores
+  06_defer_producers.ores
+  07_break_continue.ores
+  08_loop_cleanup.ores
 
 docs/
   callables.md
@@ -76,6 +85,46 @@ scripts/
 SOURCE_REF
 justfile
 ```
+
+## New cleanup and loop-control examples
+
+### `05_defer_lifo.ores`
+
+Shows direct zero-arity deferred lambdas and their function-scoped LIFO order.
+
+Expected output:
+
+```text
+body
+second defer
+first defer
+```
+
+### `06_defer_producers.ores`
+
+Shows the intentionally non-Go-like rule for call expressions used with `defer`:
+
+```ores
+defer file.Close();
+```
+
+`file.Close()` executes immediately and must return a zero-arity function. That returned
+function is what runs at callable exit. The example also demonstrates a self-invoking
+lambda producer.
+
+### `07_break_continue.ores`
+
+Demonstrates `continue` and `break` in both classic `for (;;)` and `for (... of ...)`
+loops. In a classic loop, `continue` still evaluates the update expression while `break`
+does not.
+
+Expected totals are `13` and `40`.
+
+### `08_loop_cleanup.ores`
+
+Combines `continue`, `break`, `try/finally`, and callable-scoped `defer`. The
+`finally` block runs before loop control resumes, while deferred actions remain registered
+until `main` exits and then run LIFO.
 
 ## Callable model
 
