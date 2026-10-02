@@ -1,0 +1,27 @@
+namespace option_demo;
+
+fnc lookup(bool found) => Option<int> {
+  if found; do
+    return Some(42);
+  else
+    return None;
+  fi
+}
+
+fnc unwrap_safely(Option<int> maybe) => int {
+  match maybe {
+    Some(value) => {
+      return value;
+    }
+    None => {
+      return 0;
+    }
+  }
+}
+
+pub routine main() => void {
+  stdio.println(unwrap_safely(lookup(true)));
+  stdio.println(unwrap_safely(lookup(false)));
+  stdio.println("option-match-ok");
+  return;
+}
