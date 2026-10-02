@@ -24,17 +24,22 @@ ores_prepare_managed_source() {
 
     if [[ -d "$ORESLANG_SIBLING_SOURCE_DIR/.git" ]]; then
       git clone --quiet --no-checkout "$ORESLANG_SIBLING_SOURCE_DIR" "$source_dir"
-
-      upstream_url="$(git -C "$ORESLANG_SIBLING_SOURCE_DIR" remote get-url origin 2>/dev/null || true)"
-      if [[ -n "$upstream_url" ]]; then
-        git -C "$source_dir" remote set-url origin "$upstream_url"
-      fi
     elif command -v gh >/dev/null 2>&1; then
       gh repo clone ores-truffle-oreslang/oreslang-source.java "$source_dir"
     else
       echo "the pinned Oreslang source checkout is unavailable and gh is not installed" >&2
       echo "either install gh or set ORESLANG_SOURCE_DIR=/path/to/oreslang-source.java" >&2
       return 69
+    fi
+  fi
+
+  # Older versions of this runner seeded .cache from the sibling checkout, which
+  # left origin pointing at a local filesystem path. Repair that origin on every
+  # run so future SOURCE_REF bumps can fetch commits the sibling does not have.
+  if [[ -d "$ORESLANG_SIBLING_SOURCE_DIR/.git" ]]; then
+    upstream_url="$(git -C "$ORESLANG_SIBLING_SOURCE_DIR" remote get-url origin 2>/dev/null || true)"
+    if [[ -n "$upstream_url" ]]; then
+      git -C "$source_dir" remote set-url origin "$upstream_url"
     fi
   fi
 
