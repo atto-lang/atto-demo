@@ -19,7 +19,6 @@ Every top-level `.ores` file in this directory is executed by `scripts/run-all.s
 | `12_generic_inheritance.ores` | generic interfaces, inherited generic fields/methods, concrete substitution |
 | `13_logical_operators.ores` | `&&`, `||`, `^^`, precedence and short-circuit behavior |
 | `14_bitwise_operators.ores` | `~`, `&`, `|`, `^`, `<<`, `>>`, `>>>` |
-| `15_import_sibling_files.ores` | importing a sibling source file and destructuring an imported return |
 | `16_option_result_unwrap.ores` | `Option`/`Result`, `unwrap`, `unwrap_safe`, variant predicates |
 | `17_interfaces_classes_static_and_structural.ores` | interface parameters, structural parameters, class members, static members |
 | `18_mut_and_destructuring.ores` | `mut` parameters, mutable locals, returned-result destructuring |
@@ -34,6 +33,6 @@ The `keywords/` subdirectory is intentionally excluded from the normal top-level
 bash scripts/run-keyword-demos.sh
 ```
 
-The keyword suite additionally covers `defer/recover`, private/shared actors, async/await, callable-local interfaces, pointerless `borrow/copy/take/share`, four-way class/struct/trait/interface parameter boundaries, canonical `as` declaration bodies, and `is`/`with` trait composition. Feature-stack examples stay pinned until their compiler work lands on the default source revision.
+The keyword suite additionally covers `defer/recover`, private/shared actors, async/await, callable-local interfaces, sibling source imports, pointerless `borrow/copy/take/share`, four-way class/struct/trait/interface parameter boundaries, canonical `as` declaration bodies, and `is`/`with` trait composition. Feature-stack examples stay pinned until their compiler work lands on the default source revision.
 
 See `keywords/README.md` and `../docs/keyword-contracts.md`.
