@@ -29,15 +29,16 @@ Requirements:
 - Maven;
 - GitHub CLI (`gh`) only if the Oreslang source repository is not already checked out next to this repo.
 
-Clone both repositories next to each other:
+Clone the demo and run it:
 
 ```bash
-gh repo clone ores-truffle-oreslang/oreslang-source.java
 gh repo clone ores-truffle-oreslang/oreslang-demo
 
 cd oreslang-demo
 bash scripts/run-all.sh
 ```
+
+The runner compiles the Oreslang implementation before invoking the launcher. A bare Maven `exec:java` is not enough on a fresh source checkout because it does not implicitly run the `compile` lifecycle.
 
 Or run one file:
 
@@ -45,7 +46,7 @@ Or run one file:
 bash scripts/run.sh examples/01_modules_namespaces_callables.ores
 ```
 
-If `../oreslang-source.java` is absent, the runner clones the source repository into `.cache/oreslang-source.java` and checks out the revision in `SOURCE_REF`.
+By default, the runner uses `../oreslang-source.java` only when that checkout is already at the exact revision in `SOURCE_REF`. Otherwise it leaves the sibling checkout untouched and uses a pinned checkout in `.cache/oreslang-source.java`. This prevents an unrelated local compiler branch from silently changing demo behavior.
 
 You can override the compiler/runtime checkout without modifying anything:
 
@@ -96,7 +97,9 @@ See `docs/callables.md` for the exact split.
 
 ## Compiler/runtime pin
 
-`SOURCE_REF` pins the compiler/runtime revision used as the stable baseline for these demos. The local sibling checkout is never automatically rewritten or checked out to that revision; only the runner-managed cache is pinned.
+`SOURCE_REF` pins the compiler/runtime revision used as the stable baseline for these demos. An adjacent checkout is used only when its `HEAD` exactly matches that pin. The local sibling checkout is never rewritten or checked out automatically; the runner-managed cache is pinned instead.
+
+Set `ORESLANG_SOURCE_DIR` when you intentionally want to test a local compiler/runtime branch rather than the pinned demo baseline.
 
 ## Current implementation boundary
 
