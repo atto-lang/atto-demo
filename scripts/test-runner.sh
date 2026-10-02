@@ -11,6 +11,7 @@ bin_dir="$tmp_root/bin"
 mvn_log="$tmp_root/mvn.log"
 
 mkdir -p "$demo/scripts/lib" "$demo/examples" "$bin_dir"
+cp "$repo_root/scripts/run.sh" "$demo/scripts/run.sh"
 cp "$repo_root/scripts/run-all.sh" "$demo/scripts/run-all.sh"
 cp "$repo_root/scripts/lib/runtime.sh" "$demo/scripts/lib/runtime.sh"
 
@@ -28,6 +29,13 @@ printf 'newer local worktree\n' > "$source_repo/local.txt"
 git -C "$source_repo" add local.txt
 git -C "$source_repo" commit -qm "second"
 sibling_head="$(git -C "$source_repo" rev-parse HEAD)"
+
+printf 'experimental keyword revision\n' > "$source_repo/experimental.txt"
+git -C "$source_repo" add experimental.txt
+git -C "$source_repo" commit -qm "experimental"
+override_ref="$(git -C "$source_repo" rev-parse HEAD)"
+git -C "$source_repo" branch keyword-contract "$override_ref"
+git -C "$source_repo" reset -q --hard "$sibling_head"
 
 printf '%s\n' "$pinned_ref" > "$demo/SOURCE_REF"
 printf 'demo one\n' > "$demo/examples/00_one.ores"
@@ -82,6 +90,33 @@ case "$output" in
   *)
     echo "unexpected run-all output:" >&2
     printf '%s\n' "$output" >&2
+    exit 1
+    ;;
+esac
+
+override_output="$(
+  cd "$demo"
+  PATH="$bin_dir:$PATH" MVN_LOG="$mvn_log" \
+    ORESLANG_SOURCE_REF_OVERRIDE="$override_ref" \
+    bash scripts/run.sh examples/00_one.ores
+)"
+
+if [[ "$(git -C "$source_repo" rev-parse HEAD)" != "$sibling_head" ]]; then
+  echo "source-ref override mutated the sibling checkout" >&2
+  exit 1
+fi
+
+if [[ "$(git -C "$demo/.cache/oreslang-source.java" rev-parse HEAD)" != "$override_ref" ]]; then
+  echo "managed checkout did not honor ORESLANG_SOURCE_REF_OVERRIDE" >&2
+  exit 1
+fi
+
+case "$override_output" in
+  *"Source revision: $override_ref"*"output:00_one.ores"*"PASS"*)
+    ;;
+  *)
+    echo "unexpected source-ref override output:" >&2
+    printf '%s\n' "$override_output" >&2
     exit 1
     ;;
 esac

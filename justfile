@@ -8,3 +8,6 @@ run-all:
 
 source-ref:
     cat SOURCE_REF
+
+keyword-demos:
+    bash scripts/run-keyword-demos.sh
