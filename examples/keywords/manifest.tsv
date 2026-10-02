@@ -10,5 +10,5 @@ actor-no-caller-stack	examples/keywords/07_actor_no_caller_stack.ores	2c6f4118c1
 async-await-contract	examples/keywords/08_async_await_contract.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	run	async-await-contract-ok
 async-no-sync-fallback	examples/keywords/09_async_no_sync_fallback.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	fail	refuses to run it synchronously
 invalid-async-actor	examples/keywords/10_invalid_async_actor.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	fail	mutually exclusive
-gc-contract	examples/keywords/12_gc_contract.ores	0c97f6b39b290b1b92c7979eb41006a77894c1d6	run	gc-contract-ok
-private-actor-process-gc-denied	examples/keywords/13_private_actor_process_gc_denied.ores	0c97f6b39b290b1b92c7979eb41006a77894c1d6	fail	PROCESS_GC
+gc-contract	examples/keywords/12_gc_contract.ores	9359e049b316447134d2019e2135078af8eed9b6	run	gc-contract-ok
+private-actor-process-gc-denied	examples/keywords/13_private_actor_process_gc_denied.ores	9359e049b316447134d2019e2135078af8eed9b6	fail	PROCESS_GC
