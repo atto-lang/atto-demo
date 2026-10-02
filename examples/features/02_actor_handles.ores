@@ -1,0 +1,31 @@
+namespace feature_actor_handles;
+
+pub actor fnc private_worker(int value) => int {
+  return value + 1;
+}
+
+pub shared actor fnc shared_worker(int value) => int {
+  return value + 2;
+}
+
+pub async fnc collect_private() => int {
+  val ActorHandle<int> handle = private_worker(40);
+  val ActorId actor_id = handle.id;
+  val ActorKind kind = handle.kind;
+  val ActorStatus status = handle.status();
+  val bool alive = handle.is_alive();
+  return await handle.result();
+}
+
+fnc type_contract() => void {
+  val ActorHandle<int> private_handle = private_worker(40);
+  val ActorHandle<int> shared_handle = shared_worker(40);
+  val Future<int> private_result = private_handle.result();
+  val Future<int> shared_result = shared_handle.result();
+  return;
+}
+
+pub routine main() => void {
+  stdio.println("actor-example-ok");
+  return;
+}
