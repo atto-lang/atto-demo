@@ -1,23 +1,38 @@
 namespace ownership_intrinsics_demo;
 
-define struct Point {
-  int x;
-  int y;
+struct Point {
+  x: int;
+  y: int;
 }
 
-fnc read(@Structural Point value) => int {
-  return value.x + value.y;
+define class Buffer as
+  pub let int value = 0;
+
+  pub copy() => Buffer {
+    return new Buffer(self.value);
+  }
+end
+
+fnc inspect(&Buffer value) => int {
+  return value.value;
 }
 
 pub routine main() => void {
-  val p = new Point(20, 22);
-  val p2 = copy(p);
-  val borrowed = borrow(p2);
-  val shared = share(p2);
-  val moved = take(p2);
+  let Point point = Point { x = 20, y = 22 };
+  let Point duplicate = copy(point);
+  stdio.stdout.write(duplicate.x + duplicate.y);
+  stdio.stdout.write(point.x);
 
-  stdio.println(read(borrowed));
-  stdio.println(read(shared));
-  stdio.println(read(moved));
+  let Buffer original = new Buffer(7);
+  stdio.stdout.write(inspect(borrow(original)));
+
+  val &Buffer snapshot = share(original);
+  original.value = 9;
+  stdio.stdout.write(inspect(snapshot));
+  stdio.stdout.write(original.value);
+
+  let Buffer moving = new Buffer(5);
+  let Buffer moved = take(moving);
+  stdio.stdout.write(moved.value);
   return;
 }
