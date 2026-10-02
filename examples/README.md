@@ -20,7 +20,7 @@ Every top-level `.ores` file in this directory is executed by `scripts/run-all.s
 | `13_logical_operators.ores` | `&&`, `||`, `^^`, precedence and short-circuit behavior |
 | `14_bitwise_operators.ores` | `~`, `&`, `|`, `^`, `<<`, `>>`, `>>>` |
 | `16_option_result_unwrap.ores` | `Option`/`Result`, `unwrap`, `unwrap_safe`, variant predicates |
-| `17_interfaces_classes_static_and_structural.ores` | interface parameters, structural parameters, class members, static members |
+| `17_interfaces_classes_static_and_structural.ores` | nominal interface parameters, class members, static members; structural dispatch remains feature-pinned below |
 | `18_mut_and_destructuring.ores` | `mut` parameters, mutable locals, returned-result destructuring |
 
 These are executable examples, not syntax sketches. The compiler/runtime revision used by default is pinned in the repository root `SOURCE_REF`.
