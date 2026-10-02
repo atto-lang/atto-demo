@@ -7,8 +7,10 @@ if [[ $# -ne 1 ]]; then
 fi
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-input="$1"
+# shellcheck source=lib/runtime.sh
+source "$repo_root/scripts/lib/runtime.sh"
 
+input="$1"
 if [[ "$input" = /* ]]; then
   example="$input"
 else
@@ -20,78 +22,28 @@ if [[ ! -f "$example" ]]; then
   exit 66
 fi
 
-if ! command -v mvn >/dev/null 2>&1; then
-  echo "mvn is required" >&2
-  exit 69
-fi
+ores_require_tools
+ores_resolve_source
+ores_print_source
 
-source_ref="$(tr -d '[:space:]' < "$repo_root/SOURCE_REF")"
-managed_source_dir="$repo_root/.cache/oreslang-source.java"
-sibling_source_dir="$repo_root/../oreslang-source.java"
+echo "==> Building Oreslang runtime..."
+ores_build_runtime
+echo "BUILD PASS"
 
-prepare_managed_source() {
-  local source_dir="$managed_source_dir"
+echo
+echo "==> $(basename "$example")"
 
-  if [[ ! -f "$source_dir/pom.xml" ]]; then
-    mkdir -p "$repo_root/.cache"
+tmp_dir="$(mktemp -d "${TMPDIR:-/tmp}/oreslang-demo.XXXXXX")"
+trap 'rm -rf "$tmp_dir"' EXIT
 
-    if [[ -d "$sibling_source_dir/.git" ]]; then
-      # Seed the managed checkout from the user's local clone. This is fast,
-      # works without gh, and never mutates the sibling worktree.
-      git clone --quiet --no-checkout "$sibling_source_dir" "$source_dir"
-    elif command -v gh >/dev/null 2>&1; then
-      gh repo clone ores-truffle-oreslang/oreslang-source.java "$source_dir"
-    else
-      echo "the pinned Oreslang source checkout is unavailable and gh is not installed" >&2
-      echo "either install gh or set ORESLANG_SOURCE_DIR=/path/to/oreslang-source.java" >&2
-      exit 69
-    fi
-  fi
-
-  if ! git -C "$source_dir" cat-file -e "$source_ref^{commit}" 2>/dev/null; then
-    git -C "$source_dir" fetch --quiet origin "$source_ref"
-  fi
-
-  git -C "$source_dir" checkout --quiet --detach "$source_ref"
-  printf '%s\n' "$source_dir"
-}
-
-if [[ -n "${ORESLANG_SOURCE_DIR:-}" ]]; then
-  source_dir="$ORESLANG_SOURCE_DIR"
-
-  if [[ ! -f "$source_dir/pom.xml" ]]; then
-    echo "ORESLANG_SOURCE_DIR does not contain pom.xml: $source_dir" >&2
-    exit 66
-  fi
-
-  source_mode="explicit local checkout"
-elif [[ -f "$sibling_source_dir/pom.xml" ]] \
-  && git -C "$sibling_source_dir" rev-parse --is-inside-work-tree >/dev/null 2>&1 \
-  && [[ "$(git -C "$sibling_source_dir" rev-parse HEAD 2>/dev/null || true)" == "$source_ref" ]]; then
-  source_dir="$sibling_source_dir"
-  source_mode="adjacent pinned checkout"
+if ores_exec_example "$example" >"$tmp_dir/stdout" 2>"$tmp_dir/stderr"; then
+  cat "$tmp_dir/stdout"
+  ores_emit_success_stderr "$tmp_dir/stderr"
+  echo "PASS"
 else
-  if [[ -f "$sibling_source_dir/pom.xml" ]]; then
-    sibling_head="$(git -C "$sibling_source_dir" rev-parse HEAD 2>/dev/null || printf 'unknown')"
-    echo "==> Adjacent oreslang-source.java is not at SOURCE_REF; leaving it untouched."
-    echo "    adjacent HEAD: $sibling_head"
-    echo "    required HEAD: $source_ref"
-  fi
-
-  source_dir="$(prepare_managed_source)"
-  source_mode="managed pinned checkout"
+  status=$?
+  cat "$tmp_dir/stdout"
+  cat "$tmp_dir/stderr" >&2
+  echo "FAIL" >&2
+  exit "$status"
 fi
-
-echo "==> Oreslang source: $source_dir ($source_mode)"
-echo "==> Source revision: $(git -C "$source_dir" rev-parse HEAD 2>/dev/null || printf 'local/unversioned')"
-echo "==> Demo: $(basename "$example")"
-
-# exec:java does not implicitly run Maven's compile lifecycle. Compile first so a
-# fresh source checkout has dev.oreslang.launcher.OresMain and generated Truffle
-# classes available before the launcher is invoked.
-mvn -B -ntp -e \
-  -f "$source_dir/pom.xml" \
-  -DskipTests \
-  compile \
-  exec:java \
-  -Dexec.args="$example"
