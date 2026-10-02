@@ -1,0 +1,13 @@
+# name	target	source_ref	mode	expected
+sibling-imports	examples/features/imports	c951d0ff77ab363db8280baf48aa428515698e16	compile-dir	feature-compile-ok
+local-inline-interfaces	examples/features/01_local_and_inline_interfaces.ores	d3184dd09de383c6e7cb2f5d029dd4b6f913482f	run	local-interface-ok
+type-model-args	examples/features/02_type_model_args.ores	d3184dd09de383c6e7cb2f5d029dd4b6f913482f	run	type-model-ok
+trait-runtime-boundary	examples/features/03_trait_is_not_runtime_value.ores	d3184dd09de383c6e7cb2f5d029dd4b6f913482f	fail	no runtime/value type identity
+class-static-members	examples/features/04_class_members_and_static_members.ores	f8b822f9422d4308df1361b7dd1a4e49adad8ddd	run	member-static-ok
+pointerless-ownership	examples/features/05_pointerless_ownership.ores	e760fcaf20d2b02ac9cf49b581f9cdabb1e1d2e2	run	ownership-ok
+share-boundary	examples/features/06_share_is_explicit_capability.ores	e760fcaf20d2b02ac9cf49b581f9cdabb1e1d2e2	fail	reserved for explicit shared capabilities
+option-matching	examples/features/07_option_matching.ores	01b57b328a31627c5f21e237c68dc9009009adef	run	option-match-ok
+union-return-destructuring	examples/features/08_union_return_destructuring.ores	764ac8692cfe068f8c43b42b710de68913847a1b	run	union-destructure-ok
+actor-declarations	examples/features/09_actor_declarations.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	run	actor-declarations-ok
+async-await-usage	examples/features/10_async_await_usage.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	run	async-await-usage-ok
+defer-recover-together	examples/features/11_defer_recover_together.ores	b37075603307e759cd8c101c5e48fa36fb4bc841	run	BAR7:BA9
