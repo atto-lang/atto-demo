@@ -105,3 +105,22 @@ Set `ORESLANG_SOURCE_DIR` when you intentionally want to test a local compiler/r
 
 The source repository currently defines actor-owned mutable heaps, frozen/message-passed cross-actor values, read-only sharing, and stricter capability-gated isolates. The public Oreslang grammar does not yet expose a complete actor declaration/mailbox syntax, so this repo keeps those runtime semantics documented rather than pretending unsupported source code is executable.
 
+
+## Runner output
+
+`scripts/run-all.sh` resolves the compiler/runtime once, compiles it once, and then executes each demo independently. Successful runs are intentionally compact:
+
+```text
+==> Building Oreslang runtime...
+BUILD PASS
+
+==> 00_hello.ores
+hello from oreslang
+PASS
+
+...
+
+5/5 demos passed
+```
+
+Known Graal/Truffle `sun.misc.Unsafe` deprecation lines are suppressed only after a demo succeeds; unrelated stderr is still printed. Set `ORESLANG_SHOW_RUNTIME_WARNINGS=1` to show the full runtime warning stream.
