@@ -71,10 +71,35 @@ The split makes source intent statically visible:
 
 This also creates useful compiler freedom. A routine never needs recursive-call machinery. A lambda's capture set is explicit to the compiler. A `fnc` remains a named code object rather than automatically becoming a closure.
 
-## About `nlex`
+## `nlex`
 
-There is currently no `nlex` keyword.
+`nlex` is implemented as an opt-in capture barrier.
 
-The proposed meaning is sensible only if benchmarks show a material optimization: prohibit capture of outer **local stack bindings** so the compiler can prove that no closure environment is required. Imports, modules, top-level declarations, and runtime globals would remain resolvable as non-captured symbols.
+It prohibits capture of outer activation-local bindings while preserving access
+to symbols whose lifetime is independent of a particular function invocation:
 
-That feature should not land as syntax until the compiler demonstrates a real benefit over ordinary capture analysis. If capture analysis can already prove the same thing for free, `nlex` would add language complexity without a performance payoff.
+- module members;
+- imports;
+- file-level/top-level functions and classes;
+- built-ins such as `stdio`, `process`, and `print`.
+
+Locals and parameters declared inside the `nlex` callable remain ordinary
+lexical bindings, including normal shadowing:
+
+```ores
+val int bias = 100;
+
+val IntFn stateless = nlex |value| -> {
+  val int bias = 1;
+  return math.offset(value) + bias;
+};
+```
+
+The outer `bias` is not captured; the inner `bias` is local to the lambda.
+
+The barrier is inherited. A lambda created anywhere inside an `nlex fnc`,
+`nlex routine`, or another `nlex` lambda is also non-capturing with respect
+to enclosing activation-local state.
+
+This has an actual runtime fast path: ordinary lambdas snapshot/retain their
+lexical environment; `nlex` lambdas skip that environment snapshot entirely.
