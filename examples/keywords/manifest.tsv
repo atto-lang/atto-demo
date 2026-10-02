@@ -10,4 +10,4 @@ actor-no-caller-stack	examples/keywords/07_actor_no_caller_stack.ores	2c6f4118c1
 async-await-contract	examples/keywords/08_async_await_contract.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	run	async-await-contract-ok
 async-no-sync-fallback	examples/keywords/09_async_no_sync_fallback.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	fail	refuses to run it synchronously
 invalid-async-actor	examples/keywords/10_invalid_async_actor.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	fail	mutually exclusive
-gc-contract	examples/keywords/12_gc_contract.ores	bfc04c7b5647679b982a23e45ef94bc9b177936f	run	PASS
+gc-contract	examples/keywords/12_gc_contract.ores	fc681664ff1ac6a8427b6ccd86753ea70723e556	run	gc-contract-ok
