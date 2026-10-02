@@ -21,7 +21,8 @@ This repository is intentionally a **demo consumer** of the language implementat
 - custom iterators and scheduler safepoints;
 - finite tuple and structural-record return types;
 - returned-value destructuring and reusable `_` discard patterns;
-- inheritance across module-qualified classes.
+- inheritance across module-qualified classes;
+- revision-pinned sibling imports, callable-local interfaces, traits/structs/classes/interfaces, static members, pointerless ownership, Option matching, actor declarations, async/await, and advanced returned-result destructuring.
 
 The stable examples stay pinned to the root `SOURCE_REF`. Experimental keyword contracts for `defer`, `recover`, `lex`, `nlex`, `gpu`, `actor`, `async`, and `await` live separately under `examples/keywords/` because those features currently span stacked source branches.
 
@@ -32,6 +33,14 @@ bash scripts/run-keyword-demos.sh
 ```
 
 Each keyword case pins its own exact source commit and declares whether it must run successfully or fail closed for a specific reason. See `docs/keyword-contracts.md`.
+
+Newer cross-cutting language examples live under `examples/features/` and also pin the exact source revision that owns each contract:
+
+```bash
+bash scripts/run-feature-demos.sh
+```
+
+That suite includes a multi-file compiler harness for sibling imports and expected-failure contracts for safety boundaries such as direct trait values and ambient `share(...)`. See `examples/features/README.md`.
 
 ## Quick start
 
@@ -89,6 +98,15 @@ examples/
     01_defer.ores
     ...
     11_invalid_lex_nlex.ores
+  features/
+    README.md
+    manifest.tsv
+    imports/
+      app.ores
+      lib.ores
+    01_local_and_inline_interfaces.ores
+    ...
+    11_defer_recover_together.ores
 
 docs/
   callables.md
@@ -99,6 +117,9 @@ scripts/
   run.sh
   run-all.sh
   run-keyword-demos.sh
+  run-feature-demos.sh
+  compile-feature-dir.sh
+  java/CompileFeatureDir.java
 
 SOURCE_REF
 justfile
@@ -132,7 +153,9 @@ The current pin is the merge revision for the typed returned-result/destructurin
 
 ## Current implementation boundary
 
-The source repository currently defines actor-owned mutable heaps, frozen/message-passed cross-actor values, read-only sharing, and stricter capability-gated isolates. The public Oreslang grammar does not yet expose a complete actor declaration/mailbox syntax, so this repo keeps those runtime semantics documented rather than pretending unsupported source code is executable.
+The stable root `SOURCE_REF` remains intentionally conservative. Newer language surfaces that are implemented on stacked source branches are demonstrated under `examples/keywords/` and `examples/features/`, each with an exact source revision. The demo therefore distinguishes stable runnable syntax from revision-pinned contracts instead of silently advancing the global compiler pin or inventing unsupported syntax.
+
+In particular, the current Option hardening uses exhaustive `match` for safe extraction; it intentionally does not define unchecked built-in `unwrap()` or a built-in `unwrap_safe()` yet.
 
 
 ## Runner output
