@@ -19,7 +19,8 @@ This repository is intentionally a **demo consumer** of the language implementat
 - callable-scoped LIFO `defer`;
 - defer producer functions and self-invoking producer lambdas;
 - `break` / `continue` for classic and for-of loops;
-- nested loop control and `try/finally` interaction.
+- nested loop control and `try/finally` interaction;
+- globally reserved `of`, `is`, and `as` keyword rules.
 
 The runtime also already has actor isolation and deny-by-default isolate capability machinery. Those are documented here, but this demo does **not** invent actor source syntax that is not yet in the grammar.
 
@@ -79,6 +80,7 @@ examples/
 docs/
   callables.md
   runtime-boundaries.md
+  reserved-keywords.md
 
 scripts/
   run.sh
