@@ -1,0 +1,29 @@
+namespace defer_recover_demo;
+
+fnc guarded(bool fail) => int {
+  recover |err| -> {
+    stdio.stdout.write("R");
+    return 7;
+  };
+
+  defer || -> {
+    stdio.stdout.write("A");
+  };
+
+  defer || -> {
+    stdio.stdout.write("B");
+  };
+
+  if fail; do
+    panic "boom";
+  else
+    return 9;
+  fi
+}
+
+pub routine main() => void {
+  stdio.stdout.write(guarded(true));
+  stdio.stdout.write(":");
+  stdio.stdout.write(guarded(false));
+  return;
+}
