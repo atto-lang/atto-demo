@@ -1,0 +1,56 @@
+pub interface DownMessage {
+  event: String;
+  reason: String;
+}
+
+fnc counter(str message, int state) => int {
+  stdio.stdout.write(state);
+  return state + 1;
+}
+
+fnc print_worker(str message) => void {
+  stdio.stdout.write(message);
+  return;
+}
+
+fnc supervisor(@Structural DownMessage message) => void {
+  stdio.stdout.write(":");
+  stdio.stdout.write(message.event);
+  stdio.stdout.write(":");
+  stdio.stdout.write(message.reason);
+  return;
+}
+
+fnc crashing_worker(str message) => void {
+  actor.join(actor.self);
+  return;
+}
+
+pub routine main() => void {
+  -- Stateful actor: the initial state is copied into the actor boundary.
+  val counter_ref = actor.spawn(counter, 0);
+  actor.send(counter_ref, "tick");
+  actor.send(counter_ref, "tick");
+  actor.stop(counter_ref);
+  actor.join(counter_ref);
+
+  -- A singleton is one named actor, not globally shared mutable memory.
+  val singleton_ref = actor.singleton("demo_singleton", print_worker);
+  actor.send(singleton_ref, ":singleton");
+  actor.stop(singleton_ref);
+  actor.join(singleton_ref);
+
+  -- Erlang-style monitor: the watcher receives DOWN when the child fails.
+  val supervisor_ref = actor.spawn(supervisor);
+  val child_ref = actor.spawn(crashing_worker);
+  actor.monitor(child_ref, supervisor_ref);
+  actor.send(child_ref, "boom");
+  actor.join(child_ref);
+  actor.stop(supervisor_ref);
+  actor.join(supervisor_ref);
+
+  -- Explicit collection exists, while ownership/drop remains the primary
+  -- lifetime mechanism.
+  process.gc();
+  return;
+}
