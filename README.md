@@ -11,6 +11,7 @@ This repository is intentionally a **demo consumer** of the language implementat
 - file-level `main`;
 - `routine` versus `fnc` versus lambda semantics;
 - lexical closures;
+- `nlex` non-capturing callables and inherited capture barriers;
 - nominal types with explicit structural-call opt-in;
 - classes and receiver methods;
 - explicit `return`;
@@ -19,7 +20,12 @@ This repository is intentionally a **demo consumer** of the language implementat
 
 The runtime also already has actor isolation and deny-by-default isolate capability machinery. Those are documented here, but this demo does **not** invent actor source syntax that is not yet in the grammar.
 
-Likewise, `nlex` is intentionally not demonstrated: it is not currently a language keyword. It should only be added if compiler/runtime measurements show a real non-tradeoff win from closure-environment elision.
+The `05_nlex_callables.ores` example demonstrates the implemented `nlex`
+capture barrier. A normal lambda captures outer activation-local bindings;
+an `nlex` lambda cannot. Module/import/global names remain resolvable, local
+shadowing remains normal, and lambdas created inside an `nlex fnc` or
+`nlex routine` inherit the barrier. The runtime uses this guarantee to skip
+lexical environment snapshotting for those lambdas.
 
 ## Quick start
 
@@ -46,6 +52,14 @@ Or run one file:
 bash scripts/run.sh examples/01_modules_namespaces_callables.ores
 ```
 
+Run the focused `nlex` regression check:
+
+```bash
+bash scripts/test-nlex.sh
+```
+
+It asserts the exact runtime output `120:102:13:15`.
+
 By default, the runner uses `../oreslang-source.java` only when that checkout is already at the exact revision in `SOURCE_REF`. Otherwise it leaves the sibling checkout untouched and uses a pinned checkout in `.cache/oreslang-source.java`. This prevents an unrelated local compiler branch from silently changing demo behavior.
 
 You can override the compiler/runtime checkout without modifying anything:
@@ -64,6 +78,7 @@ examples/
   02_structural_types.ores
   03_classes_and_methods.ores
   04_control_flow.ores
+  05_nlex_callables.ores
 
 docs/
   callables.md
@@ -84,6 +99,7 @@ justfile
 | `routine` | yes | no | n/a | prohibited | entrypoints, lifecycle, orchestration |
 | `fnc` | yes | callable by name | no implicit closure capture | allowed | reusable computation, recursion |
 | lambda | anonymous | yes | yes | allowed when typed appropriately | callbacks, closures, local behavior |
+| `nlex` lambda | anonymous | yes | no outer activation-local capture | no local captured self-binding | stateless callbacks / closure-elision fast path |
 
 The canonical entrypoint form is:
 
