@@ -33,14 +33,19 @@ prepare_managed_source() {
   local source_dir="$managed_source_dir"
 
   if [[ ! -f "$source_dir/pom.xml" ]]; then
-    if ! command -v gh >/dev/null 2>&1; then
+    mkdir -p "$repo_root/.cache"
+
+    if [[ -d "$sibling_source_dir/.git" ]]; then
+      # Seed the managed checkout from the user's local clone. This is fast,
+      # works without gh, and never mutates the sibling worktree.
+      git clone --quiet --no-checkout "$sibling_source_dir" "$source_dir"
+    elif command -v gh >/dev/null 2>&1; then
+      gh repo clone ores-truffle-oreslang/oreslang-source.java "$source_dir"
+    else
       echo "the pinned Oreslang source checkout is unavailable and gh is not installed" >&2
       echo "either install gh or set ORESLANG_SOURCE_DIR=/path/to/oreslang-source.java" >&2
       exit 69
     fi
-
-    mkdir -p "$repo_root/.cache"
-    gh repo clone ores-truffle-oreslang/oreslang-source.java "$source_dir"
   fi
 
   if ! git -C "$source_dir" cat-file -e "$source_ref^{commit}" 2>/dev/null; then
