@@ -11,7 +11,7 @@ async-await-contract	examples/keywords/08_async_await_contract.ores	2c6f4118c14b
 async-no-sync-fallback	examples/keywords/09_async_no_sync_fallback.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	fail	refuses to run it synchronously
 invalid-async-actor	examples/keywords/10_invalid_async_actor.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	fail	mutually exclusive
 local-interfaces	examples/keywords/12_local_interfaces.ores	9f1feb0c379ce8ce03996fae69556edf1a2dd324	run	Ada
-ownership-intrinsics	examples/keywords/13_ownership_intrinsics.ores	de94010a4b21baff75859dae1746749f5aae0465	run	42
+ownership-intrinsics	examples/keywords/13_ownership_intrinsics.ores	1893daeaf7c7301f819846ab570f7ced96550337	run	422077995
 traits-is-with	examples/keywords/14_traits_is_with.ores	e34499fefea0a21d3801470d74a9e321f1426cb2	run	user
 async-actor-usage	examples/keywords/15_async_actor_usage.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	run	async-actor-usage-ok
 four-way-type-params	examples/keywords/16_four_way_type_params.ores	e34499fefea0a21d3801470d74a9e321f1426cb2	run	trait
