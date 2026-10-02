@@ -22,5 +22,6 @@ The manifest pins an exact compiler/runtime commit for every demo.
 | `09_async_no_sync_fallback.ores` | expected failure: async body never silently runs synchronously |
 | `10_invalid_async_actor.ores` | expected compile failure: async and actor are mutually exclusive |
 | `11_invalid_lex_nlex.ores` | expected compile failure: lex and nlex cannot be combined |
+| `12_gc_contract.ores` | ownership-first GC surface: actor-local `actor.gc()` plus capability-gated `process.gc()` |
 
 These are contract tests as much as demos: an expected failure is a PASS only when it fails for the specified reason.
