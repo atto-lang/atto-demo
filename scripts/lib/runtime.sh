@@ -4,7 +4,11 @@
 # This file is sourced by run.sh and run-all.sh.
 
 ORESLANG_DEMO_ROOT="${ORESLANG_DEMO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
-ORESLANG_SOURCE_REF="$(tr -d '[:space:]' < "$ORESLANG_DEMO_ROOT/SOURCE_REF")"
+ORESLANG_SOURCE_REF="${ORESLANG_SOURCE_REF_OVERRIDE:-$(tr -d '[:space:]' < "$ORESLANG_DEMO_ROOT/SOURCE_REF")}"
+if [[ -z "$ORESLANG_SOURCE_REF" ]]; then
+  echo "Oreslang source revision cannot be empty" >&2
+  return 64 2>/dev/null || exit 64
+fi
 ORESLANG_MANAGED_SOURCE_DIR="$ORESLANG_DEMO_ROOT/.cache/oreslang-source.java"
 ORESLANG_SIBLING_SOURCE_DIR="$ORESLANG_DEMO_ROOT/../oreslang-source.java"
 
