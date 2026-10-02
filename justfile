@@ -8,3 +8,7 @@ run-all:
 
 source-ref:
     cat SOURCE_REF
+
+
+test-nlex:
+    bash scripts/test-nlex.sh
