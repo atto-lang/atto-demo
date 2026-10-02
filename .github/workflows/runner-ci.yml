@@ -1,0 +1,29 @@
+name: runner-ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: runner-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  runner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate shell syntax
+        run: |
+          bash -n scripts/run.sh
+          bash -n scripts/run-all.sh
+          bash -n scripts/lib/runtime.sh
+          bash -n scripts/test-runner.sh
+
+      - name: Test pinned runner behavior
+        run: bash scripts/test-runner.sh
