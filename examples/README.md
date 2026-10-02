@@ -15,6 +15,10 @@ Every top-level `.ores` file in this directory is executed by `scripts/run-all.s
 | `08_typed_returns_and_destructuring.ores` | finite tuple types, record types, typed return destructuring |
 | `09_destructure_discards.ores` | reusable `_` discard patterns |
 | `10_inheritance_and_collections.ores` | inheritance, modules, mutable locals, arrays and objects |
+| `11_generics_and_inference.ores` | generic functions/classes, explicit and inferred type arguments, nested generics |
+| `12_generic_inheritance.ores` | generic interfaces, inherited generic fields/methods, concrete substitution |
+| `13_logical_operators.ores` | `&&`, `||`, `^^`, precedence and short-circuit behavior |
+| `14_bitwise_operators.ores` | `~`, `&`, `|`, `^`, `<<`, `>>`, `>>>` |
 
 These are executable examples, not syntax sketches. The compiler/runtime revision used by default is pinned in the repository root `SOURCE_REF`.
 
