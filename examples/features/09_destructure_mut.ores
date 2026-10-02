@@ -1,0 +1,25 @@
+fnc getLists() => Array<Array<int>> {
+  return arr[arr[1, 2], arr[3, 4]];
+}
+
+struct Bag {
+  pub values: Array<int>
+  pub name: String
+}
+
+fnc getBag() => Bag {
+  return Bag { values = arr[1, 2], name = "bag" };
+}
+
+pub fnc main() => void {
+  [val mut left, const right] = getLists();
+  left[0] = 9;
+  stdio.stdout.write(left[0]);
+  stdio.stdout.write(right[0]);
+
+  {val mut values, const name} = getBag();
+  values[1] = 8;
+  stdio.stdout.write(values[1]);
+  stdio.stdout.write(name);
+  return;
+}
