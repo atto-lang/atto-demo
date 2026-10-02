@@ -8,20 +8,16 @@ fnc lookup(bool found) => Option<int> {
   fi
 }
 
-fnc unwrap_safely(Option<int> maybe) => int {
-  match maybe {
-    Some(value) => {
-      return value;
-    }
-    None => {
-      return 0;
-    }
-  }
-}
-
 pub routine main() => void {
-  stdio.println(unwrap_safely(lookup(true)));
-  stdio.println(unwrap_safely(lookup(false)));
-  stdio.println("option-match-ok");
+  val Option<int> present = lookup(true);
+  val int value = present.unwrap();
+
+  val Option<int> missing = lookup(false);
+  val Result<int, OptionUnwrapError> safe = missing.unwrap_safe();
+
+  stdio.println(value);
+  stdio.println(safe.is_err());
+  stdio.println(safe);
+  stdio.println("option-unwrap-ok");
   return;
 }
