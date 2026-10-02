@@ -1,0 +1,28 @@
+namespace union_destructure_demo;
+
+type Scalar = int | bool | string;
+
+fnc tuple_variant(bool flag) => [int, string] | [bool, string] {
+  if flag; do
+    return [3, "number"];
+  else
+    return [true, "boolean"];
+  fi
+}
+
+fnc values() => Array<Scalar> {
+  return [3, true, "yes"];
+}
+
+pub fnc main() => void {
+  const [value, label] = tuple_variant(false);
+  [const number, flag, answer] = values();
+
+  stdio.println(value);
+  stdio.println(label);
+  stdio.println(number);
+  stdio.println(flag);
+  stdio.println(answer);
+  stdio.println("union-destructure-ok");
+  return;
+}
