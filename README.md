@@ -15,7 +15,11 @@ This repository is intentionally a **demo consumer** of the language implementat
 - classes and receiver methods;
 - explicit `return`;
 - `const`, `val`, and `let`;
-- complex numbers, arrays, objects, tuples, and ordinary control flow.
+- complex numbers, arrays, objects, tuples, and ordinary control flow;
+- callable-scoped LIFO `defer`;
+- defer producer functions and self-invoking producer lambdas;
+- `break` / `continue` for classic and for-of loops;
+- nested loop control and `try/finally` interaction.
 
 The runtime also already has actor isolation and deny-by-default isolate capability machinery. Those are documented here, but this demo does **not** invent actor source syntax that is not yet in the grammar.
 
@@ -64,6 +68,13 @@ examples/
   02_structural_types.ores
   03_classes_and_methods.ores
   04_control_flow.ores
+  05_defer_lifo.ores
+  06_defer_producers.ores
+  07_break_continue.ores
+  08_nested_loop_control.ores
+  09_for_of_control.ores
+  10_try_finally_loop_control.ores
+  11_defer_with_loop_control.ores
 
 docs/
   callables.md
