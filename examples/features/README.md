@@ -23,28 +23,26 @@ A contract can be:
 | `04_class_members_and_static_members.ores` | instance members, constructor initialization, class static data, instance/static access |
 | `05_pointerless_ownership.ores` | ordinary read borrows, `mut` exclusive parameters, `borrow(x)`, `copy(x)`, and `take` ownership transfer |
 | `06_share_is_explicit_capability.ores` | expected rejection: `share(x)` cannot manufacture ambient shared mutable state |
-| `07_option_matching.ores` | `Option<T>`, `Some`, `None`, and exhaustive safe payload extraction with `match` |
+| `07_option_matching.ores` | `Option<T>`, `Some`, `None`, panicking `unwrap()`, and non-panicking `unwrap_safe()` returning `Result<T, OptionUnwrapError>` |
 | `08_union_return_destructuring.ores` | union-typed finite-return shapes, homogeneous arrays, and destructuring returned results |
 | `09_actor_declarations.ores` | private/shared actor functions, `shared actor` declarations, actor-owned mutable state, `ActorHandle<T>` and result futures |
 | `10_async_await_usage.ores` | `Future<T>` typing, multiple `await` points, and explicit `await handle.result()` for actor completion |
 | `11_defer_recover_together.ores` | LIFO `defer`, panic recovery, defer-before-recover, and recovery skipped on normal return |
+| `12_mut_is_as_with.ores` | focused syntax example for `mut` parameters plus `is`, `as`, and `with` in the four-way type model |
 
 ## Option unwrap policy
 
-The current Option hardening revision intentionally does **not** define an unchecked built-in `unwrap()`, and there is no built-in `unwrap_safe()` contract to demonstrate yet. The safe, implemented spelling is exhaustive matching:
+The pinned Option/Result hardening revision implements both extraction forms:
 
 ```ores
-match maybe {
-  Some(value) => {
-    return value;
-  }
-  None => {
-    return 0;
-  }
-}
+val Option<int> present = Some(42);
+val int value = present.unwrap();
+
+val Option<int> missing = None;
+val Result<int, OptionUnwrapError> safe = missing.unwrap_safe();
 ```
 
-`07_option_matching.ores` wraps that pattern in an ordinary helper named `unwrap_safely`; that helper is user code, not a compiler intrinsic. This repository should add `unwrap`/`unwrap_safe` examples only after their semantics land in the language implementation.
+`unwrap()` returns the payload and raises a language panic on `None`. `unwrap_safe()` never panics for absence; it preserves failure as a `Result` value. The feature demo executes both paths.
 
 ## Inline/local interface policy
 
