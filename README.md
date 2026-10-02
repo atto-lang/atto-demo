@@ -15,7 +15,13 @@ This repository is intentionally a **demo consumer** of the language implementat
 - classes and receiver methods;
 - explicit `return`;
 - `const`, `val`, and `let`;
-- complex numbers, arrays, objects, tuples, and ordinary control flow.
+- complex numbers, arrays, objects, tuples, and ordinary control flow;
+- affine ownership, owned mutation, and mutable borrows;
+- escaping lexical closures and explicitly typed recursive lambdas;
+- custom iterators and scheduler safepoints;
+- finite tuple and structural-record return types;
+- returned-value destructuring and reusable `_` discard patterns;
+- inheritance across module-qualified classes.
 
 The runtime also already has actor isolation and deny-by-default isolate capability machinery. Those are documented here, but this demo does **not** invent actor source syntax that is not yet in the grammar.
 
@@ -64,6 +70,13 @@ examples/
   02_structural_types.ores
   03_classes_and_methods.ores
   04_control_flow.ores
+  05_ownership_and_borrows.ores
+  06_closures_and_recursive_lambdas.ores
+  07_iterators_and_scheduler_safepoints.ores
+  08_typed_returns_and_destructuring.ores
+  09_destructure_discards.ores
+  10_inheritance_and_collections.ores
+  README.md
 
 docs/
   callables.md
@@ -101,6 +114,8 @@ See `docs/callables.md` for the exact split.
 
 Set `ORESLANG_SOURCE_DIR` when you intentionally want to test a local compiler/runtime branch rather than the pinned demo baseline.
 
+The current pin is the merge revision for the typed returned-result/destructuring work. That exact source tree was independently verified under GraalVM 25.3 / Java 25 with `mvn verify`: 78 tests passed with zero failures, including all returned-destructuring tests.
+
 ## Current implementation boundary
 
 The source repository currently defines actor-owned mutable heaps, frozen/message-passed cross-actor values, read-only sharing, and stricter capability-gated isolates. The public Oreslang grammar does not yet expose a complete actor declaration/mailbox syntax, so this repo keeps those runtime semantics documented rather than pretending unsupported source code is executable.
@@ -120,7 +135,7 @@ PASS
 
 ...
 
-5/5 demos passed
+11/11 demos passed
 ```
 
 Known Graal/Truffle `sun.misc.Unsafe` deprecation lines are suppressed only after a demo succeeds; unrelated stderr is still printed. Set `ORESLANG_SHOW_RUNTIME_WARNINGS=1` to show the full runtime warning stream.
