@@ -12,13 +12,18 @@ This repository is intentionally a **demo consumer** of the language implementat
 - `routine` versus `fnc` versus lambda semantics;
 - lexical closures;
 - `nlex` non-capturing callables and inherited capture barriers;
+- actor spawning and PID-like `ActorRef` handles;
+- actor-private persistent state;
+- Erlang-style monitor/`DOWN` supervision signals;
+- named singleton actors without shared mutable memory;
+- explicit `process.gc()` alongside ownership/drop-first lifetime management;
 - nominal types with explicit structural-call opt-in;
 - classes and receiver methods;
 - explicit `return`;
 - `const`, `val`, and `let`;
 - complex numbers, arrays, objects, tuples, and ordinary control flow.
 
-The runtime also already has actor isolation and deny-by-default isolate capability machinery. Those are documented here, but this demo does **not** invent actor source syntax that is not yet in the grammar.
+The actor runtime surface is now executable from Oreslang through `actor.spawn`, `actor.send`, `actor.stop`, `actor.join`, `actor.monitor`, `actor.singleton`, `actor.self`, `process.share_readonly`, and `process.gc()`. Actor declaration sugar is still intentionally absent; these APIs are the canonical executable substrate.
 
 The `05_nlex_callables.ores` example demonstrates the implemented `nlex`
 capture barrier. A normal lambda captures outer activation-local bindings;
@@ -60,6 +65,14 @@ bash scripts/test-nlex.sh
 
 It asserts the exact runtime output `120:102:13:15`.
 
+Run the actor/GC regression check:
+
+```bash
+bash scripts/test-actors.sh
+```
+
+It asserts the deterministic output `01:singleton:DOWN:failed`: two stateful counter messages, one named singleton actor message, then an Erlang-style `DOWN` failure notification.
+
 By default, the runner uses `../oreslang-source.java` only when that checkout is already at the exact revision in `SOURCE_REF`. Otherwise it leaves the sibling checkout untouched and uses a pinned checkout in `.cache/oreslang-source.java`. This prevents an unrelated local compiler branch from silently changing demo behavior.
 
 You can override the compiler/runtime checkout without modifying anything:
@@ -79,6 +92,7 @@ examples/
   03_classes_and_methods.ores
   04_control_flow.ores
   05_nlex_callables.ores
+  06_actors_gc.ores
 
 docs/
   callables.md
@@ -119,5 +133,7 @@ Set `ORESLANG_SOURCE_DIR` when you intentionally want to test a local compiler/r
 
 ## Current implementation boundary
 
-The source repository currently defines actor-owned mutable heaps, frozen/message-passed cross-actor values, read-only sharing, and stricter capability-gated isolates. The public Oreslang grammar does not yet expose a complete actor declaration/mailbox syntax, so this repo keeps those runtime semantics documented rather than pretending unsupported source code is executable.
+Actors have semantically private mutable state and communicate through frozen/copied mailbox messages. Large values may cross actors only through explicit read-only sharing. `ActorRef` values are copyable PID-like handles, monitors provide supervisor-visible `DOWN` messages, and singleton state remains owned by one named actor.
+
+The current Java/Truffle reference runtime still uses the JVM heap as its physical backing heap. Ownership/move/drop analysis and eager scope release minimize garbage, while the host collector handles residual dynamic graphs. `process.gc()` is therefore currently a capability-gated, globally rate-limited JVM GC hint; it is deliberately shaped so a future actor-local heap collector can implement the same source API.
 
