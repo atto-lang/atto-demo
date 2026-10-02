@@ -27,3 +27,16 @@ bash scripts/run-keyword-demos.sh
 ```
 
 See `keywords/README.md` and `../docs/keyword-contracts.md`.
+
+
+## Revision-pinned feature contracts
+
+The `features/` subdirectory covers newer language contracts that span source branches: sibling imports, callable-local interfaces, the class/struct/interface/trait split, static members, pointerless ownership, Option matching, advanced return destructuring, actor declarations, async/await, and defer/recover.
+
+Run them with:
+
+```bash
+bash scripts/run-feature-demos.sh
+```
+
+Each case pins the exact source revision it requires. Expected safety rejections are part of the suite, and sibling imports are compiled as a multi-file code-unit set. See `features/README.md`.
