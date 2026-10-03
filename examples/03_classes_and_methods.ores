@@ -17,7 +17,7 @@ define module model
 
 end
 
-pub routine main() => void {
+pub routine main() : void {
   val answer = new model.Answer();
 
   stdio.println(answer.value());
