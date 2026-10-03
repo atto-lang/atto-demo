@@ -1,9 +1,9 @@
 namespace keyword_invalid_combination_demo;
 
-pub async actor fnc invalid() => int {
+pub async actor fnc invalid() : int {
   return 1;
 }
 
-pub routine main() => void {
+pub routine main() : void {
   return;
 }
