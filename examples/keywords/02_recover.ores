@@ -1,6 +1,6 @@
 namespace keyword_recover_demo;
 
-fnc guarded(bool fail) => int {
+fnc guarded(bool fail) : int {
   recover |err| -> {
     stdio.stdout.write("R");
     return 7;
@@ -17,7 +17,7 @@ fnc guarded(bool fail) => int {
   fi
 }
 
-pub routine main() => void {
+pub routine main() : void {
   stdio.stdout.write(guarded(true));
   stdio.stdout.write(":");
   stdio.stdout.write(guarded(false));
