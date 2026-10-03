@@ -13,7 +13,7 @@ define class Counter as
   }
 end
 
-define module helpers as
+define module helpers
   pub fnc answer() => int {
     return 42;
   }

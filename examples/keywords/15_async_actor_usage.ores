@@ -9,27 +9,18 @@ pub async fnc collect() => int {
   return result + 1;
 }
 
-pub actor fnc private_worker(int value) => int {
-  return value + 1;
-}
-
-pub shared actor fnc shared_worker(int value) => int {
+pub actor fnc shared_worker(int value) => int {
   return value + 2;
 }
 
-fnc contracts() => void {
-  val Future<int> pending = collect();
-
-  val ActorHandle<int> private_handle = private_worker(40);
-  val Future<int> private_result = private_handle.result();
-
-  val ActorHandle<int> shared_handle = shared_worker(40);
-  val Future<int> shared_result = shared_handle.result();
-
-  return;
+pub isoactor fnc private_worker(int value) => int {
+  return value + 1;
 }
 
 pub routine main() => void {
-  stdio.println("async-actor-usage-ok");
+  val shared_result = shared_worker(40);
+  val private_result = private_worker(40);
+  stdio.println(shared_result);
+  stdio.println(private_result);
   return;
 }

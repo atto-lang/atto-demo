@@ -19,20 +19,14 @@ Every top-level `.ores` file in this directory is executed by `scripts/run-all.s
 | `12_generic_inheritance.ores` | generic interfaces, inherited generic fields/methods, concrete substitution |
 | `13_logical_operators.ores` | `&&`, `||`, `^^`, precedence and short-circuit behavior |
 | `14_bitwise_operators.ores` | `~`, `&`, `|`, `^`, `<<`, `>>`, `>>>` |
-| `16_option_result_unwrap.ores` | `Option`/`Result`, `unwrap`, `unwrap_safe`, variant predicates |
-| `17_interfaces_classes_static_and_structural.ores` | nominal interface parameters, class members, static members; structural dispatch remains feature-pinned below |
-| `18_mut_and_destructuring.ores` | `mut` parameters, mutable locals, returned-result destructuring |
+| `16_option_result_unwrap.ores` | current `Option`/`Result` extraction and inspection |
+| `17_interfaces_classes_static_and_structural.ores` | current interface/class/static-member boundaries |
+| `18_mut_and_destructuring.ores` | `mut` parameters, mutable locals, returned-value destructuring |
 
 These are executable examples, not syntax sketches. The compiler/runtime revision used by default is pinned in the repository root `SOURCE_REF`.
 
 ## Experimental keyword contracts
 
-The `keywords/` subdirectory is intentionally excluded from the normal top-level glob used by `run-all.sh`. Those examples are pinned to feature-specific source commits and are run through:
+The `keywords/` subdirectory is excluded from the normal top-level glob used by `run-all.sh`. The active entries are listed in `keywords/manifest.tsv`.
 
-```bash
-bash scripts/run-keyword-demos.sh
-```
-
-The keyword suite additionally covers `defer/recover`, private/shared actors, async/await, callable-local interfaces, sibling source imports, pointerless `borrow/copy/take/share`, four-way class/struct/trait/interface parameter boundaries, canonical `as` declaration bodies, and `is`/`with` trait composition. Feature-stack examples stay pinned until their compiler work lands on the default source revision.
-
-See `keywords/README.md` and `../docs/keyword-contracts.md`.
+The current-source additions cover isolated `isoactor` versus shared-by-default `actor`, actor-local/process GC, async/await with direct actor-callable results, canonical class `as` bodies, and sibling source imports. Historical syntax that is not present in current source main is intentionally not registered as an active contract.

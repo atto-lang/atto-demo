@@ -10,10 +10,8 @@ actor-no-caller-stack	examples/keywords/07_actor_no_caller_stack.ores	2c6f4118c1
 async-await-contract	examples/keywords/08_async_await_contract.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	run	async-await-contract-ok
 async-no-sync-fallback	examples/keywords/09_async_no_sync_fallback.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	fail	refuses to run it synchronously
 invalid-async-actor	examples/keywords/10_invalid_async_actor.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	fail	mutually exclusive
-local-interfaces	examples/keywords/12_local_interfaces.ores	9f1feb0c379ce8ce03996fae69556edf1a2dd324	run	Ada
-ownership-intrinsics	examples/keywords/13_ownership_intrinsics.ores	1893daeaf7c7301f819846ab570f7ced96550337	run	422077995
-traits-is-with	examples/keywords/14_traits_is_with.ores	e34499fefea0a21d3801470d74a9e321f1426cb2	run	user
-async-actor-usage	examples/keywords/15_async_actor_usage.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	run	async-actor-usage-ok
-four-way-type-params	examples/keywords/16_four_way_type_params.ores	e34499fefea0a21d3801470d74a9e321f1426cb2	run	trait
-as-declaration-syntax	examples/keywords/17_as_declaration_syntax.ores	bd0e7fcedf37828d70d20dcf429303bc53c55971	run	counter
-sibling-import	examples/keywords/18_import_sibling_files.ores	c951d0ff77ab363db8280baf48aa428515698e16	run	42
+gc-contract	examples/keywords/12_gc_contract.ores	9ca7bf7d3e555a53600ed47136d833d2979a28e8	run	gc-contract-ok
+private-actor-process-gc-denied	examples/keywords/13_private_actor_process_gc_denied.ores	9ca7bf7d3e555a53600ed47136d833d2979a28e8	fail	PROCESS_GC
+async-actor-usage	examples/keywords/15_async_actor_usage.ores	9ca7bf7d3e555a53600ed47136d833d2979a28e8	run	42
+as-declaration-syntax	examples/keywords/17_as_declaration_syntax.ores	9ca7bf7d3e555a53600ed47136d833d2979a28e8	run	counter
+sibling-import	examples/keywords/18_import_sibling_files.ores	9ca7bf7d3e555a53600ed47136d833d2979a28e8	run	42

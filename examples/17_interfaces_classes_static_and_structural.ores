@@ -4,7 +4,7 @@ define interface Named
   fnc name() => String;
 end
 
-define class User implements Named
+define class User implements Named as
   pub val String label = "Ada";
 
   pub name() => String {

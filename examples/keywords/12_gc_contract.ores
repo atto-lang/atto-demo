@@ -1,0 +1,19 @@
+actor SharedCleaner {
+  pub fnc compact() => void {
+    actor.gc();
+    return;
+  }
+}
+
+isoactor PrivateCleaner {
+  pub fnc compact() => void {
+    actor.gc();
+    return;
+  }
+}
+
+pub routine main() => void {
+  process.gc();
+  stdio.println("gc-contract-ok");
+  return;
+}
