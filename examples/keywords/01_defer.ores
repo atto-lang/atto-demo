@@ -1,6 +1,6 @@
 namespace keyword_defer_demo;
 
-fnc compute() => int {
+fnc compute() : int {
   defer || -> {
     stdio.stdout.write("A");
   };
@@ -13,7 +13,7 @@ fnc compute() => int {
   return 7;
 }
 
-pub routine main() => void {
+pub routine main() : void {
   stdio.stdout.write(compute());
   return;
 }
