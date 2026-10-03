@@ -1,10 +1,10 @@
 namespace keyword_actor_fail_closed_demo;
 
-pub actor fnc worker(int value) => int {
+pub actor fnc worker(int value) : int {
   return value + 1;
 }
 
-pub routine main() => void {
+pub routine main() : void {
   worker(41);
   return;
 }
