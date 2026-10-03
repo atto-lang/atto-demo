@@ -123,7 +123,7 @@ justfile
 The canonical entrypoint form is:
 
 ```ores
-pub routine main() => void {
+pub routine main() : void {
   return;
 }
 ```
