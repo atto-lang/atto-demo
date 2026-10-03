@@ -1,10 +1,10 @@
 namespace keyword_async_fail_closed_demo;
 
-pub async fnc fetch() => int {
+pub async fnc fetch() : int {
   return 42;
 }
 
-pub routine main() => void {
+pub routine main() : void {
   fetch();
   return;
 }
