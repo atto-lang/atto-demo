@@ -4,7 +4,7 @@ define module model
 
   define class Answer
 
-    pub value() => int {
+    pub value() : int {
       return 42;
     }
 
