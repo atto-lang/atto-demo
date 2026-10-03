@@ -1,9 +1,9 @@
 namespace keyword_invalid_capture_demo;
 
-lex nlex fnc invalid() => int {
+lex nlex fnc invalid() : int {
   return 1;
 }
 
-pub routine main() => void {
+pub routine main() : void {
   return;
 }
