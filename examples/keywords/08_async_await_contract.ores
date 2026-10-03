@@ -1,19 +1,19 @@
 namespace keyword_async_demo;
 
-pub async fnc fetch() => int {
+pub async fnc fetch() : int {
   return 42;
 }
 
-pub async fnc collect() => int {
+pub async fnc collect() : int {
   return await fetch();
 }
 
-fnc type_contract() => void {
+fnc type_contract() : void {
   val Future<int> pending = fetch();
   return;
 }
 
-pub routine main() => void {
+pub routine main() : void {
   stdio.println("async-await-contract-ok");
   return;
 }
