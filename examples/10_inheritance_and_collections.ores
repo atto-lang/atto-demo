@@ -24,7 +24,7 @@ define module model
 end
 
 pub routine main() : void {
-  let answer = math.add(1, 2);
+  let answer = math::add(1, 2);
   answer = answer + 4;
 
   val values = arr[answer, 9];
