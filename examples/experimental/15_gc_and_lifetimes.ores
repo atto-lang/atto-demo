@@ -1,6 +1,6 @@
 namespace gc_lifetime_demo;
 
-define class Payload
+define class Payload as
   pub let String value = "owned";
 end
 
