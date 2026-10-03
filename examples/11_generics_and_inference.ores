@@ -10,7 +10,7 @@ end
 
 define module model
 
-  define class Box<T>
+  define class Box<T> as
     pub val T value;
 
     pub get() : T {
