@@ -12,7 +12,7 @@ define module collections
 
 end
 
-pub routine main() => void {
+pub routine main() : void {
   val bag = new collections.Bag();
 
   for (val item of bag) {
