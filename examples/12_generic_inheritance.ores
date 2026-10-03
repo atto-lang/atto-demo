@@ -9,7 +9,7 @@ define module model
   define class Parent<T>
     pub val T value;
 
-    pub get() => T {
+    pub get() : T {
       return self.value;
     }
   end
