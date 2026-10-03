@@ -25,9 +25,9 @@ define module closures
 end
 
 pub routine main() : void {
-  val IntFn addTen = closures.makeAdder(10);
+  val IntFn addTen = closures::makeAdder(10);
 
-  stdio.println(math.factorial(5));
+  stdio.println(math::factorial(5));
   stdio.println(addTen(7));
 
   return;
