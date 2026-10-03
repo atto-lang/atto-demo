@@ -2,7 +2,7 @@ namespace class_demo;
 
 define module model
 
-  define class Answer
+  define class Answer as
 
     pub value() : int {
       return 42;
