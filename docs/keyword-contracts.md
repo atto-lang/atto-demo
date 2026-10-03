@@ -9,7 +9,7 @@ This document records the audited contracts used by the experimental keyword dem
 | `lex` | Explicit spelling for normal lexical capture. Capture analysis retains only referenced activation-local bindings; capture-free lambdas use the no-environment path. | Cannot reopen an enclosing `nlex` barrier. |
 | `nlex` | One-way activation-local capture barrier. Module/import/top-level/builtin names remain available; locals declared inside remain normal locals. | Cannot be combined with `lex`. |
 | `gpu` | Mandatory GPU execution placement, not an optimization hint. The current ABI is conservative and scalar/void-returning. | Cannot combine with `async`; host captures and CPU calls are rejected; no backend means failure, never CPU fallback. |
-| `actor` | Concurrency/isolation boundary. Plain actor is private/confined; `shared actor` is the explicit shared-memory-capable domain. Calling `actor fnc ... => T` has type `ActorHandle<T>`. | Cannot combine with `async`; actor bodies never execute synchronously on the caller stack. |
+| `actor` | Concurrency/isolation boundary. Plain actor is private/confined; `shared actor` is the explicit shared-memory-capable domain. Calling `actor fnc ... : T` has type `ActorHandle<T>`. | Cannot combine with `async`; actor bodies never execute synchronously on the caller stack. |
 | `async` | Declares a suspendable task whose source return annotation is the fulfilled type `T`; callers see `Future<T>`. | `main` is synchronous; actor+async is invalid; declaring `=> Future<T>` would double-wrap and is rejected. |
 | `await` | Unwraps `Future<T>` only inside an async callable or actor mailbox turn. | `ActorHandle<T>` itself is not awaitable; use `await handle.result()`. Ordinary borrows cannot remain live across suspension. |
 
@@ -24,10 +24,10 @@ Only `lex` and `nlex` are keywords. `lexical` remains an ordinary identifier to 
 These are separate concurrency contracts:
 
 ```text
-async fnc foo() => T
+async fnc foo() : T
 call result: Future<T>
 
-actor fnc foo() => T
+actor fnc foo() : T
 call result: ActorHandle<T>
 completion:  Future<T> via handle.result()
 ```
