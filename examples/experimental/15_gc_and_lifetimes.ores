@@ -4,17 +4,17 @@ define class Payload
   pub let String value = "owned";
 end
 
-fnc inspect(&Payload payload) => void {
+fnc inspect(&Payload payload) : void {
   stdio.println(payload.value);
   return;
 }
 
-fnc consume(Payload payload) => void {
+fnc consume(Payload payload) : void {
   stdio.println(payload.value);
   return;
 }
 
-pub routine main() => void {
+pub routine main() : void {
   let Payload payload = new Payload();
 
   // The borrow is lexical and does not keep a second mutable owner.
