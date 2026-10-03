@@ -1,12 +1,12 @@
 namespace keyword_capture_demo;
 
-fnc make_constant() => (() -> int) {
+fnc make_constant() : (() -> int) {
   return nlex || -> {
     return 7;
   };
 }
 
-pub routine main() => void {
+pub routine main() : void {
   val int base = 10;
 
   val Fnc<int, int> captured = lex |int x| -> {
