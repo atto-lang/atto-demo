@@ -13,7 +13,7 @@ define module model
   define class Box<T>
     pub val T value;
 
-    pub get() => T {
+    pub get() : T {
       return self.value;
     }
   end
