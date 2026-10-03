@@ -2,7 +2,7 @@ namespace iterator_demo;
 
 define module collections
 
-  define class Bag
+  define class Bag as
 
     [Symbol.iterator]() : Array<int> {
       return arr[4, 5];
