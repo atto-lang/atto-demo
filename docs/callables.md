@@ -15,7 +15,7 @@ Use it for:
 - operations that should not participate in recursive call cycles.
 
 ```ores
-pub routine main() => void {
+pub routine main() : void {
   runApp();
   return;
 }
@@ -30,7 +30,7 @@ A `fnc` is the named reusable function form.
 It may recurse:
 
 ```ores
-fnc factorial(int n) => int {
+fnc factorial(int n) : int {
   if n <= 1; do
     return 1;
   else
@@ -50,7 +50,7 @@ A lambda is an anonymous first-class lexical closure.
 ```ores
 type IntFn = typeof fnc(int value) -> int;
 
-fnc makeAdder(int base) => IntFn {
+fnc makeAdder(int base) : IntFn {
   return |value| -> {
     return base + value;
   };
@@ -91,7 +91,7 @@ val int bias = 100;
 
 val IntFn stateless = nlex |value| -> {
   val int bias = 1;
-  return math.offset(value) + bias;
+  return math::offset(value) + bias;
 };
 ```
 
