@@ -29,7 +29,7 @@ pub routine main() : void {
 
   val IntFn explicit_nlex = nlex |value| -> {
     val int outer_bias = 1;
-    return math.offset(value) + outer_bias;
+    return math::offset(value) + outer_bias;
   };
 
   val IntFn inherited_nlex = makeOffsetter();
