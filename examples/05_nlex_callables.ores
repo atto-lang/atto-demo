@@ -2,25 +2,25 @@ namespace nlex_demo;
 
 type IntFn = typeof fnc(int value) -> int;
 
-define module math
+define module math as
 
-  pub fnc factorial(int n) => int {
+  pub fnc factorial(int n) : int {
     return n == 0 ? 1 : n * factorial(n - 1);
   }
 
-  pub fnc offset(int value) => int {
+  pub fnc offset(int value) : int {
     return value + 10;
   }
 
 end
 
-nlex fnc makeOffsetter() => IntFn {
+nlex fnc makeOffsetter() : IntFn {
   return |value| -> {
-    return math.offset(value);
+    return math::offset(value);
   };
 }
 
-pub routine main() => void {
+pub routine main() : void {
   val int outer_bias = 100;
 
   val IntFn lexical = |value| -> {
@@ -34,7 +34,7 @@ pub routine main() => void {
 
   val IntFn inherited_nlex = makeOffsetter();
 
-  stdio.stdout.write(math.factorial(5));
+  stdio.stdout.write(math::factorial(5));
   stdio.stdout.write(":");
   stdio.stdout.write(lexical(2));
   stdio.stdout.write(":");
