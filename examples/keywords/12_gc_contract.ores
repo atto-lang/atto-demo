@@ -4,7 +4,7 @@
 // requests collection only for the current semantic actor domain; process.gc()
 // is a separately capability-gated whole-runtime hint.
 
-actor PrivateCache {
+isoactor PrivateCache {
   let int hits = 0;
 
   pub fnc compact() => void {
@@ -13,7 +13,7 @@ actor PrivateCache {
   }
 }
 
-shared actor SharedIndex {
+actor SharedIndex {
   let int generations = 0;
 
   pub fnc compact() => void {
