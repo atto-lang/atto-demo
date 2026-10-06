@@ -1,9 +1,9 @@
 namespace control_flow_demo;
 
 fnc classify(int value) => String {
-  if value < 0; do
+  if value < 0; then
     return "negative";
-  elseif value == 0; do
+  elif value == 0; then
     return "zero";
   else
     return "positive";
