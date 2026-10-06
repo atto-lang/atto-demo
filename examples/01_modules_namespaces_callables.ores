@@ -1,11 +1,11 @@
 namespace callable_demo;
 
-type IntFn = typeof fnc(int value) -> int;
+type IntFn = typeof fnc(int value) => int;
 
-define module math
+define module math as
 
-  pub fnc factorial(int n) => int {
-    if n <= 1; do
+  pub fnc factorial(int n) -> int {
+    if n <= 1; then
       return 1;
     else
       return n * factorial(n - 1);
@@ -14,9 +14,9 @@ define module math
 
 end
 
-define module closures
+define module closures as
 
-  pub fnc makeAdder(int base) => IntFn {
+  pub fnc makeAdder(int base) -> IntFn {
     return |value| -> {
       return base + value;
     };
@@ -24,7 +24,7 @@ define module closures
 
 end
 
-pub routine main() => void {
+pub routine main() -> void {
   val IntFn addTen = closures.makeAdder(10);
 
   stdio.println(math.factorial(5));

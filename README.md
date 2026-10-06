@@ -136,7 +136,7 @@ See `docs/callables.md` for the exact split.
 
 Set `ORESLANG_SOURCE_DIR` when you intentionally want to test a local compiler/runtime branch rather than the pinned demo baseline.
 
-The current pin is the merge revision for the generics and logical/bitwise-operator hardening work. The corresponding PR head was independently verified under GraalVM 25.3 / Java 25 with `mvn verify`: 184 tests passed with zero failures, including all 16 focused generics/operator tests, plus native AOT, native hybrid, and polyglot-isolate validation.
+The current pin includes the canonical conditional grammar: `if ...; then / elif ...; then / else / fi`. Legacy conditional `do` remains accepted with a deprecation warning, while loop `do ... done` remains unchanged. The pinned compiler tree was independently validated under GraalVM 25.3 / Java 25 across fast CI, JIT/JVM, native AOT, native hybrid, and polyglot-isolate runs.
 
 ## Current implementation boundary
 

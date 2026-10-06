@@ -8,7 +8,7 @@ Every top-level `.ores` file in this directory is executed by `scripts/run-all.s
 | `01_modules_namespaces_callables.ores` | namespaces, modules, recursive `fnc`, lexical lambda |
 | `02_structural_types.ores` | explicit structural parameters, objects, arrays, tuples, complex numbers |
 | `03_classes_and_methods.ores` | classes, receiver methods, `self` |
-| `04_control_flow.ores` | `if/elseif/else/fi`, conventional loops |
+| `04_control_flow.ores` | `if/then/elif/else/fi`, conventional loops |
 | `05_ownership_and_borrows.ores` | affine move semantics, `mut` owned parameters, `&mut` borrows |
 | `06_closures_and_recursive_lambdas.ores` | escaping mutable closure state, explicitly typed recursive lambda |
 | `07_iterators_and_scheduler_safepoints.ores` | `for ... of`, `Symbol.iterator`, scheduler cooperation |
