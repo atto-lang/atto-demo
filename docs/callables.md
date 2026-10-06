@@ -31,7 +31,7 @@ It may recurse:
 
 ```ores
 fnc factorial(int n) => int {
-  if n <= 1; do
+  if n <= 1; then
     return 1;
   else
     return n * factorial(n - 1);
