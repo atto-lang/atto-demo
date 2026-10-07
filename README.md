@@ -165,3 +165,12 @@ Known Graal/Truffle `sun.misc.Unsafe` deprecation lines are suppressed only afte
 ## 2026-10-06 compiler PR compatibility
 
 For the latest 10 upstream Oreslang compiler PRs, see [docs/compiler-pr-sync.md](docs/compiler-pr-sync.md). These features remain unmerged; this repo preserves its existing compiler reference and defaults until exact-SHA integration evidence is available.
+
+## Runner CI
+
+`Demo runner contracts` checks shell syntax and runs the existing runner self-test
+on every PR and main push, with read-only permissions and no secrets. It proves
+that the runner builds once, runs each example, respects compiler overrides,
+and preserves a sibling source checkout. The test substitutes Maven; it does
+not prove compilation or execution of the Oreslang examples. Native examples
+and branch-specific keyword contracts still need their exact compiler revisions.
