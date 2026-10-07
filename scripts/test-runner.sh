@@ -35,7 +35,7 @@ git -C "$source_repo" add experimental.txt
 git -C "$source_repo" commit -qm "experimental"
 override_ref="$(git -C "$source_repo" rev-parse HEAD)"
 git -C "$source_repo" branch keyword-contract "$override_ref"
-git -C "$source_repo" reset -q --hard "$sibling_head"
+git -C "$source_repo" checkout --quiet --detach "$sibling_head"
 
 printf '%s\n' "$pinned_ref" > "$demo/SOURCE_REF"
 printf 'demo one\n' > "$demo/examples/00_one.ores"
