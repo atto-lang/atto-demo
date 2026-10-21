@@ -37,6 +37,18 @@ bash scripts/run-keyword-demos.sh
 
 Each keyword case pins its own exact source commit and declares whether it must run successfully or fail closed for a specific reason. See `docs/keyword-contracts.md`.
 
+A broader feature matrix under `examples/features/` covers async/await, actor
+handles, sibling-file imports, callable-local interfaces, defer/recover,
+Option/Result unwrap semantics, ownership intrinsics, type-role boundaries,
+static members, destructuring, and `mut/is/as/with`:
+
+```bash
+bash scripts/run-feature-demos.sh
+```
+
+Like the keyword contracts, every feature row pins the exact source revision it
+expects.
+
 ## Quick start
 
 Requirements:
@@ -97,6 +109,15 @@ examples/
     01_defer.ores
     ...
     11_invalid_lex_nlex.ores
+  features/
+    README.md
+    manifest.tsv
+    01_async_await.ores
+    ...
+    09_destructure_mut.ores
+    imports/
+      main.ores
+      math.ores
 
 docs/
   callables.md
@@ -107,6 +128,10 @@ scripts/
   run.sh
   run-all.sh
   run-keyword-demos.sh
+  run-feature-demos.sh
+  check-sibling-imports.sh
+  java/
+    ImportGraphCheck.java
 
 SOURCE_REF
 justfile
