@@ -1,0 +1,24 @@
+namespace feature_defer_recover;
+
+fnc guarded() => void {
+  recover |err| -> {
+    stdio.stdout.write("R");
+    panic err;
+  };
+
+  defer || -> {
+    stdio.stdout.write("D");
+  };
+
+  panic "boom";
+}
+
+pub routine main() => void {
+  try {
+    guarded();
+  } catch (err) {
+    stdio.stdout.write(":");
+    stdio.stdout.write(err);
+  }
+  return;
+}

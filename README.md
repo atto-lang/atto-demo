@@ -22,7 +22,10 @@ This repository is intentionally a **demo consumer** of the language implementat
 - finite tuple and structural-record return types;
 - returned-value destructuring and reusable `_` discard patterns;
 - inheritance across module-qualified classes;
-- revision-pinned sibling imports, callable-local interfaces, traits/structs/classes/interfaces, static members, pointerless ownership, Option matching, actor declarations, async/await, and advanced returned-result destructuring.
+- generic functions, classes, interfaces, explicit specialization, and inference;
+- generic inheritance with concrete field/method substitution;
+- logical `&&`, `||`, and `^^` with short-circuit semantics;
+- integer bitwise `~`, `&`, `|`, `^`, `<<`, `>>`, and `>>>`.
 
 The stable examples stay pinned to the root `SOURCE_REF`. Experimental keyword contracts for `defer`, `recover`, `lex`, `nlex`, `gpu`, `actor`, `async`, and `await` live separately under `examples/keywords/` because those features currently span stacked source branches.
 
@@ -34,13 +37,17 @@ bash scripts/run-keyword-demos.sh
 
 Each keyword case pins its own exact source commit and declares whether it must run successfully or fail closed for a specific reason. See `docs/keyword-contracts.md`.
 
-Newer cross-cutting language examples live under `examples/features/` and also pin the exact source revision that owns each contract:
+A broader feature matrix under `examples/features/` covers async/await, actor
+handles, sibling-file imports, callable-local interfaces, defer/recover,
+Option/Result unwrap semantics, ownership intrinsics, type-role boundaries,
+static members, destructuring, and `mut/is/as/with`:
 
 ```bash
 bash scripts/run-feature-demos.sh
 ```
 
-That suite includes a multi-file compiler harness for sibling imports and expected-failure contracts for safety boundaries such as direct trait values and ambient `share(...)`. See `examples/features/README.md`.
+Like the keyword contracts, every feature row pins the exact source revision it
+expects.
 
 ## Quick start
 
@@ -91,6 +98,10 @@ examples/
   08_typed_returns_and_destructuring.ores
   09_destructure_discards.ores
   10_inheritance_and_collections.ores
+  11_generics_and_inference.ores
+  12_generic_inheritance.ores
+  13_logical_operators.ores
+  14_bitwise_operators.ores
   README.md
   keywords/
     README.md
@@ -101,12 +112,12 @@ examples/
   features/
     README.md
     manifest.tsv
-    imports/
-      app.ores
-      lib.ores
-    01_local_and_inline_interfaces.ores
+    01_async_await.ores
     ...
-    11_defer_recover_together.ores
+    09_destructure_mut.ores
+    imports/
+      main.ores
+      math.ores
 
 docs/
   callables.md
@@ -118,8 +129,9 @@ scripts/
   run-all.sh
   run-keyword-demos.sh
   run-feature-demos.sh
-  compile-feature-dir.sh
-  java/CompileFeatureDir.java
+  check-sibling-imports.sh
+  java/
+    ImportGraphCheck.java
 
 SOURCE_REF
 justfile
@@ -149,13 +161,11 @@ See `docs/callables.md` for the exact split.
 
 Set `ORESLANG_SOURCE_DIR` when you intentionally want to test a local compiler/runtime branch rather than the pinned demo baseline.
 
-The current pin is the merge revision for the typed returned-result/destructuring work. That exact source tree was independently verified under GraalVM 25.3 / Java 25 with `mvn verify`: 78 tests passed with zero failures, including all returned-destructuring tests.
+The current pin includes the canonical conditional grammar: `if ...; then / elif ...; then / else / fi`. Legacy conditional `do` remains accepted with a deprecation warning, while loop `do ... done` remains unchanged. The pinned compiler tree was independently validated under GraalVM 25.3 / Java 25 across fast CI, JIT/JVM, native AOT, native hybrid, and polyglot-isolate runs.
 
 ## Current implementation boundary
 
-The stable root `SOURCE_REF` remains intentionally conservative. Newer language surfaces that are implemented on stacked source branches are demonstrated under `examples/keywords/` and `examples/features/`, each with an exact source revision. The demo therefore distinguishes stable runnable syntax from revision-pinned contracts instead of silently advancing the global compiler pin or inventing unsupported syntax.
-
-In particular, the current Option hardening uses exhaustive `match` for safe extraction; it intentionally does not define unchecked built-in `unwrap()` or a built-in `unwrap_safe()` yet.
+The source repository currently defines actor-owned mutable heaps, frozen/message-passed cross-actor values, read-only sharing, and stricter capability-gated isolates. The public Oreslang grammar does not yet expose a complete actor declaration/mailbox syntax, so this repo keeps those runtime semantics documented rather than pretending unsupported source code is executable.
 
 
 ## Runner output
@@ -172,7 +182,20 @@ PASS
 
 ...
 
-11/11 demos passed
+15/15 demos passed
 ```
 
 Known Graal/Truffle `sun.misc.Unsafe` deprecation lines are suppressed only after a demo succeeds; unrelated stderr is still printed. Set `ORESLANG_SHOW_RUNTIME_WARNINGS=1` to show the full runtime warning stream.
+
+## 2026-10-06 compiler PR compatibility
+
+For the latest 10 upstream Oreslang compiler PRs, see [docs/compiler-pr-sync.md](docs/compiler-pr-sync.md). These features remain unmerged; this repo preserves its existing compiler reference and defaults until exact-SHA integration evidence is available.
+
+## Runner CI
+
+`Demo runner contracts` checks shell syntax and runs the existing runner self-test
+on every PR and main push, with read-only permissions and no secrets. It proves
+that the runner builds once, runs each example, respects compiler overrides,
+and preserves a sibling source checkout. The test substitutes Maven; it does
+not prove compilation or execution of the Oreslang examples. Native examples
+and branch-specific keyword contracts still need their exact compiler revisions.

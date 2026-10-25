@@ -1,0 +1,10 @@
+pub actor fnc private_worker() => void {
+  // Private actors can collect only their own semantic actor domain.
+  // Whole-process GC is intentionally a separate capability.
+  process.gc();
+  return;
+}
+
+pub routine main() => void {
+  return;
+}

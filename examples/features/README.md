@@ -1,84 +1,35 @@
-# Revision-pinned feature examples
+# Feature-specific language examples
 
-These examples cover language work that currently spans multiple Oreslang source branches. They do **not** move the stable root `SOURCE_REF`. Each row in `manifest.tsv` pins the exact compiler/runtime revision that owns the demonstrated contract.
+These examples exercise newer Oreslang language surfaces that currently live on different source branches. They are executable contract examples, not syntax sketches.
 
-Run the suite with:
+Run the complete matrix with:
 
 ```bash
 bash scripts/run-feature-demos.sh
 ```
 
-A contract can be:
-
-- `run`: the example must execute and print the expected marker;
-- `fail`: the example must fail for the expected safety diagnostic;
-- `compile-dir`: every `.ores` unit in a directory is compiled together with `IncrementalCompiler`, which is how sibling source imports are resolved without granting guest code ambient filesystem access.
+Each row in `manifest.tsv` pins the exact `oreslang-source.java` revision that implements the example.
 
 | Example | Focus |
 | --- | --- |
-| `imports/app.ores` + `imports/lib.ores` | sibling-file imports: module, class, function, and namespaced wildcard |
-| `01_local_and_inline_interfaces.ores` | compact callable-local interface syntax, a callable-local struct implementing it, and a nested block-local interface |
-| `02_type_model_args.ores` | interface parameters vs concrete class/struct parameters; trait state/behavior composed with `with`; `is` conformance; `as` declaration bodies |
-| `03_trait_is_not_runtime_value.ores` | expected rejection: a trait is a composition unit, not an ordinary runtime parameter value on this revision |
-| `04_class_members_and_static_members.ores` | instance members, constructor initialization, class static data, instance/static access |
-| `05_pointerless_ownership.ores` | ordinary read borrows, `mut` exclusive parameters, `borrow(x)`, `copy(x)`, and `take` ownership transfer |
-| `06_share_is_explicit_capability.ores` | expected rejection: `share(x)` cannot manufacture ambient shared mutable state |
-| `07_option_matching.ores` | `Option<T>`, `Some`, `None`, panicking `unwrap()`, and non-panicking `unwrap_safe()` returning `Result<T, OptionUnwrapError>` |
-| `08_union_return_destructuring.ores` | union-typed finite-return shapes, homogeneous arrays, and destructuring returned results |
-| `09_actor_declarations.ores` | private/shared actor functions, `shared actor` declarations, actor-owned mutable state, `ActorHandle<T>` and result futures |
-| `10_async_await_usage.ores` | `Future<T>` typing, multiple `await` points, and explicit `await handle.result()` for actor completion |
-| `11_defer_recover_together.ores` | LIFO `defer`, panic recovery, defer-before-recover, and recovery skipped on normal return |
-| `12_mut_is_as_with.ores` | focused syntax example for `mut` parameters plus `is`, `as`, and `with` in the four-way type model |
+| `01_async_await.ores` | `async fnc`, `Future<T>`, and `await` typing |
+| `02_actor_handles.ores` | private/shared `actor fnc`, `ActorHandle<T>`, explicit result future |
+| `03_local_inline_interfaces.ores` | callable-local and nested interfaces, local structs, `is` |
+| `04_type_roles_is_as_with.ores` | interface parameters, concrete class/struct parameters, trait composition, `is/as/with` |
+| `05_defer_recover.ores` | callable-scoped LIFO `defer`, `recover`, and re-panic |
+| `06_option_unwrap.ores` | `Option<T>`, `unwrap()`, non-panicking `unwrap_safe()`, `Result<T,E>` |
+| `07_ownership_intrinsics.ores` | `borrow/copy/share/take` ownership operations |
+| `08_class_static_members.ores` | instance members, constructors, class static members |
+| `09_destructure_mut.ores` | returned arrays/structs, destructuring, `val mut` and object patterns |
+| `imports/main.ores` + `imports/math.ores` | sibling source-unit import resolution |
 
-## Option unwrap policy
+## Type-role rule of thumb
 
-The pinned Option/Result hardening revision implements both extraction forms:
+- **interface**: storage-free capability contract; accept it when callers may pass different conforming representations.
+- **trait**: reusable state/behavior composition; compose it into a concrete class or struct with `with` rather than instantiating it alone.
+- **struct**: nominal value representation; accept the concrete struct when its representation/category matters.
+- **class**: nominal identity/reference representation; accept the concrete class when class identity/category matters.
 
-```ores
-val Option<int> present = Some(42);
-val int value = present.unwrap();
+`03_local_inline_interfaces.ores` uses the current supported "inline" form: a **named interface declared directly inside a callable body**. Anonymous `interface { ... }` type literals directly in a parameter/return slot are not part of the current grammar.
 
-val Option<int> missing = None;
-val Result<int, OptionUnwrapError> safe = missing.unwrap_safe();
-```
-
-`unwrap()` returns the payload and raises a language panic on `None`. `unwrap_safe()` never panics for absence; it preserves failure as a `Result` value. The feature demo executes both paths.
-
-## Inline/local interface policy
-
-“Inline interface” here means the compact interface declaration placed directly inside a callable body:
-
-```ores
-fnc work() => void {
-  interface LocalApi {
-    fnc ping() => int;
-  }
-  return;
-}
-```
-
-Callable-local types are lexically scoped and direct callable-body declarations are type-hoisted where the compiler contract permits it. This suite does not invent an anonymous interface-literal type syntax that the parser does not implement.
-
-## Four-way type model at parameter boundaries
-
-The examples make the intended roles explicit:
-
-- **class**: concrete reference/identity representation; may be accepted directly as a nominal parameter;
-- **struct**: concrete value representation; may be accepted directly as a nominal parameter;
-- **interface**: storage-free behavior contract; classes/structs can satisfy it with `is` and then pass through an interface parameter;
-- **trait**: reusable state/behavior composition via `with`; on the pinned four-way integration revision it is not itself an ordinary runtime value type, and the negative contract verifies that boundary.
-
-## Ownership boundary
-
-On the pointerless ownership revision:
-
-- `Box value` temporarily read-borrows a non-Copy argument;
-- `mut Box value` takes an exclusive temporary mutable borrow;
-- `take Box value` transfers ownership;
-- `borrow(x)` makes the read-borrow explicit;
-- `copy(x)` succeeds only when Copy is proven;
-- `share(x)` does not bypass ownership. Ordinary values are rejected until an explicit shared-capability type is involved.
-
-## Actor and async runtime boundary
-
-The actor/async examples intentionally execute only their synchronous `main` markers. Their declarations and type contracts are checked, but the pinned interpreter refuses to fake asynchronous or actor execution synchronously while continuation/dispatcher lowering is incomplete. That fail-closed runtime policy is separately covered by the keyword contracts.
+The sibling-import case uses the compiler's multi-source `IncrementalCompiler` graph rather than the single-file CLI launcher. That proves `./math.ores` resolves as a supplied sibling source unit without implying that the single-file launcher already provides a cross-unit runtime linker.

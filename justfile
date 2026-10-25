@@ -11,7 +11,3 @@ source-ref:
 
 keyword-demos:
     bash scripts/run-keyword-demos.sh
-
-
-feature-demos:
-    bash scripts/run-feature-demos.sh

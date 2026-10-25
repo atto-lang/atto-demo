@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+repo_root="$(cd "$(dirname "$0")/.." && pwd)"
 manifest="$repo_root/examples/features/manifest.tsv"
 
 if [[ ! -f "$manifest" ]]; then
@@ -13,11 +13,11 @@ passed=0
 failed=0
 total=0
 
-tmp_dir="$(mktemp -d "${TMPDIR:-/tmp}/oreslang-features.XXXXXX")"
+tmp_dir="$(mktemp -d "/tmp/oreslang-features.XXXXXX")"
 trap 'rm -rf "$tmp_dir"' EXIT
 
-while IFS=$'\t' read -r name target source_ref mode expected; do
-  [[ -z "${name:-}" || "$name" == \#* ]] && continue
+while IFS=$'\t' read -r name file source_ref mode expected; do
+  [[ -z "$name" || "$name" == \#* ]] && continue
 
   total=$((total + 1))
   output_file="$tmp_dir/$name.log"
@@ -33,54 +33,34 @@ while IFS=$'\t' read -r name target source_ref mode expected; do
     run|fail)
       (
         cd "$repo_root"
-        ORESLANG_SOURCE_REF_OVERRIDE="$source_ref" \
-          bash scripts/run.sh "$target"
+        ORESLANG_SOURCE_REF_OVERRIDE="$source_ref" bash scripts/run.sh "$file"
       ) >"$output_file" 2>&1
       status=$?
       ;;
-    compile-dir)
+    import-graph)
       (
         cd "$repo_root"
-        ORESLANG_SOURCE_REF_OVERRIDE="$source_ref" \
-          bash scripts/compile-feature-dir.sh "$target"
+        ORESLANG_SOURCE_REF_OVERRIDE="$source_ref" bash scripts/check-sibling-imports.sh "$(dirname "$file")"
       ) >"$output_file" 2>&1
       status=$?
       ;;
     *)
-      printf "unknown feature demo mode '%s'\n" "$mode" >"$output_file"
+      printf 'unknown feature demo mode: %s\n' "$mode" >"$output_file"
       status=64
       ;;
   esac
   set -e
 
-  case "$mode" in
-    run|compile-dir)
-      if [[ "$status" -eq 0 ]] && grep -Fq -- "$expected" "$output_file"; then
-        cat "$output_file"
-        echo "CONTRACT PASS: $name"
-        passed=$((passed + 1))
-      else
-        cat "$output_file"
-        echo "CONTRACT FAIL: $name (expected success containing: $expected)" >&2
-        failed=$((failed + 1))
-      fi
-      ;;
-    fail)
-      if [[ "$status" -ne 0 ]] && grep -Fq -- "$expected" "$output_file"; then
-        cat "$output_file"
-        echo "EXPECTED FAILURE PASS: $name"
-        passed=$((passed + 1))
-      else
-        cat "$output_file"
-        if [[ "$status" -eq 0 ]]; then
-          echo "CONTRACT FAIL: $name unexpectedly succeeded" >&2
-        else
-          echo "CONTRACT FAIL: $name failed for the wrong reason; expected: $expected" >&2
-        fi
-        failed=$((failed + 1))
-      fi
-      ;;
-  esac
+  if { [[ "$mode" == "fail" && "$status" -ne 0 ]] || [[ "$mode" != "fail" && "$status" -eq 0 ]]; } \
+     && grep -Fq -- "$expected" "$output_file"; then
+    cat "$output_file"
+    echo "CONTRACT PASS: $name ($mode)"
+    passed=$((passed + 1))
+  else
+    cat "$output_file"
+    echo "CONTRACT FAIL: $name ($mode; exit=$status; expected diagnostic/output: $expected)" >&2
+    failed=$((failed + 1))
+  fi
 done < "$manifest"
 
 echo
