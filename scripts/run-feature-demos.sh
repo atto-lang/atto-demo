@@ -30,7 +30,7 @@ while IFS=$'\t' read -r name file source_ref mode expected; do
 
   set +e
   case "$mode" in
-    run)
+    run|fail)
       (
         cd "$repo_root"
         ORESLANG_SOURCE_REF_OVERRIDE="$source_ref" bash scripts/run.sh "$file"
@@ -51,13 +51,14 @@ while IFS=$'\t' read -r name file source_ref mode expected; do
   esac
   set -e
 
-  if [[ "$status" -eq 0 ]] && grep -Fq -- "$expected" "$output_file"; then
+  if { [[ "$mode" == "fail" && "$status" -ne 0 ]] || [[ "$mode" != "fail" && "$status" -eq 0 ]]; } \
+     && grep -Fq -- "$expected" "$output_file"; then
     cat "$output_file"
-    echo "CONTRACT PASS: $name"
+    echo "CONTRACT PASS: $name ($mode)"
     passed=$((passed + 1))
   else
     cat "$output_file"
-    echo "CONTRACT FAIL: $name (expected success containing: $expected)" >&2
+    echo "CONTRACT FAIL: $name ($mode; exit=$status; expected diagnostic/output: $expected)" >&2
     failed=$((failed + 1))
   fi
 done < "$manifest"

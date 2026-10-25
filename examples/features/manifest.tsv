@@ -9,3 +9,5 @@ ownership-intrinsics	examples/features/07_ownership_intrinsics.ores	de94010a4b21
 class-static-members	examples/features/08_class_static_members.ores	f8b822f9422d4308df1361b7dd1a4e49adad8ddd	run	jsontrue
 destructure-mut	examples/features/09_destructure_mut.ores	66c57c41470c974aac6bcb24948b38a34d40d2c0	run	938bag
 sibling-import-graph	examples/features/imports/main.ores	f2e1e371f4478a85b67813a786eb8b6d555271a4	import-graph	import-graph-ok:2
+trait-runtime-boundary	examples/features/negatives/trait_not_runtime_value.ores	d3184dd09de383c6e7cb2f5d029dd4b6f913482f	fail	no runtime/value type identity
+share-boundary	examples/features/negatives/share_explicit_capability.ores	e760fcaf20d2b02ac9cf49b581f9cdabb1e1d2e2	fail	reserved for explicit shared capabilities
