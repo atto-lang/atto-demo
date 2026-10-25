@@ -1,0 +1,8 @@
+import module math from "./math.ores";
+
+namespace feature_sibling_import_main;
+
+pub routine main() => void {
+  stdio.println("sibling-import-main-ok");
+  return;
+}

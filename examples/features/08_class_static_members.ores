@@ -1,0 +1,16 @@
+define class MyBlob as
+  pub foo: String;
+  pub static bar: bool = false;
+
+  constructor(String value) {
+    self.foo = value;
+  }
+end
+
+pub routine main() => void {
+  val MyBlob blob = new MyBlob("json");
+  MyBlob.bar = true;
+  stdio.stdout.write(blob.foo);
+  stdio.stdout.write(MyBlob.bar);
+  return;
+}

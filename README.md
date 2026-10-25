@@ -37,6 +37,18 @@ bash scripts/run-keyword-demos.sh
 
 Each keyword case pins its own exact source commit and declares whether it must run successfully or fail closed for a specific reason. See `docs/keyword-contracts.md`.
 
+A broader feature matrix under `examples/features/` covers async/await, actor
+handles, sibling-file imports, callable-local interfaces, defer/recover,
+Option/Result unwrap semantics, ownership intrinsics, type-role boundaries,
+static members, destructuring, and `mut/is/as/with`:
+
+```bash
+bash scripts/run-feature-demos.sh
+```
+
+Like the keyword contracts, every feature row pins the exact source revision it
+expects.
+
 ## Quick start
 
 Requirements:
@@ -97,6 +109,15 @@ examples/
     01_defer.ores
     ...
     11_invalid_lex_nlex.ores
+  features/
+    README.md
+    manifest.tsv
+    01_async_await.ores
+    ...
+    09_destructure_mut.ores
+    imports/
+      main.ores
+      math.ores
 
 docs/
   callables.md
@@ -107,6 +128,10 @@ scripts/
   run.sh
   run-all.sh
   run-keyword-demos.sh
+  run-feature-demos.sh
+  check-sibling-imports.sh
+  java/
+    ImportGraphCheck.java
 
 SOURCE_REF
 justfile
@@ -136,7 +161,7 @@ See `docs/callables.md` for the exact split.
 
 Set `ORESLANG_SOURCE_DIR` when you intentionally want to test a local compiler/runtime branch rather than the pinned demo baseline.
 
-The current pin is the merge revision for the generics and logical/bitwise-operator hardening work. The corresponding PR head was independently verified under GraalVM 25.3 / Java 25 with `mvn verify`: 184 tests passed with zero failures, including all 16 focused generics/operator tests, plus native AOT, native hybrid, and polyglot-isolate validation.
+The current pin includes the canonical conditional grammar: `if ...; then / elif ...; then / else / fi`. Legacy conditional `do` remains accepted with a deprecation warning, while loop `do ... done` remains unchanged. The pinned compiler tree was independently validated under GraalVM 25.3 / Java 25 across fast CI, JIT/JVM, native AOT, native hybrid, and polyglot-isolate runs.
 
 ## Current implementation boundary
 
@@ -161,3 +186,16 @@ PASS
 ```
 
 Known Graal/Truffle `sun.misc.Unsafe` deprecation lines are suppressed only after a demo succeeds; unrelated stderr is still printed. Set `ORESLANG_SHOW_RUNTIME_WARNINGS=1` to show the full runtime warning stream.
+
+## 2026-10-06 compiler PR compatibility
+
+For the latest 10 upstream Oreslang compiler PRs, see [docs/compiler-pr-sync.md](docs/compiler-pr-sync.md). These features remain unmerged; this repo preserves its existing compiler reference and defaults until exact-SHA integration evidence is available.
+
+## Runner CI
+
+`Demo runner contracts` checks shell syntax and runs the existing runner self-test
+on every PR and main push, with read-only permissions and no secrets. It proves
+that the runner builds once, runs each example, respects compiler overrides,
+and preserves a sibling source checkout. The test substitutes Maven; it does
+not prove compilation or execution of the Oreslang examples. Native examples
+and branch-specific keyword contracts still need their exact compiler revisions.
