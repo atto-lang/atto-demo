@@ -134,4 +134,36 @@ if (
 fi
 grep -q "exact 40-character lowercase commit SHA" "$invalid_ref_log"
 
+dirty_source="$tmp_root/dirty-source"
+git clone -q "$source_repo" "$dirty_source"
+printf 'uncommitted source\n' > "$dirty_source/untracked.txt"
+dirty_log="$tmp_root/dirty-source.log"
+if (
+  cd "$demo"
+  PATH="$bin_dir:$PATH" MVN_LOG="$mvn_log" \
+    ORESLANG_SOURCE_DIR="$dirty_source" \
+    bash scripts/run.sh examples/00_one.ores
+) >"$dirty_log" 2>&1; then
+  echo "runner accepted a dirty explicit source checkout by default" >&2
+  cat "$dirty_log" >&2
+  exit 1
+fi
+grep -q "ORESLANG_SOURCE_DIR is dirty" "$dirty_log"
+
+allowed_output="$(
+  cd "$demo"
+  PATH="$bin_dir:$PATH" MVN_LOG="$mvn_log" \
+    ORESLANG_SOURCE_DIR="$dirty_source" \
+    ORESLANG_ALLOW_DIRTY_SOURCE=1 \
+    bash scripts/run.sh examples/00_one.ores
+)"
+case "$allowed_output" in
+  *"explicit local checkout"*"output:00_one.ores"*"PASS"*) ;;
+  *)
+    echo "dirty-source opt-in did not execute as expected" >&2
+    printf '%s\n' "$allowed_output" >&2
+    exit 1
+    ;;
+esac
+
 echo "runner self-test passed"
