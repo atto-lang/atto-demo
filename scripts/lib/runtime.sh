@@ -83,6 +83,15 @@ ores_resolve_source() {
       echo "ORESLANG_SOURCE_DIR does not contain pom.xml: $ORESLANG_RESOLVED_SOURCE_DIR" >&2
       return 66
     fi
+    if ! git -C "$ORESLANG_RESOLVED_SOURCE_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      echo "ORESLANG_SOURCE_DIR must be a Git worktree: $ORESLANG_RESOLVED_SOURCE_DIR" >&2
+      return 65
+    fi
+    if [[ "${ORESLANG_ALLOW_DIRTY_SOURCE:-0}" != "1" ]] \
+      && [[ -n "$(git -C "$ORESLANG_RESOLVED_SOURCE_DIR" status --porcelain --untracked-files=all)" ]]; then
+      echo "ORESLANG_SOURCE_DIR is dirty; commit/stash changes or set ORESLANG_ALLOW_DIRTY_SOURCE=1 intentionally" >&2
+      return 65
+    fi
 
     ORESLANG_SOURCE_MODE="explicit local checkout"
   elif [[ -f "$ORESLANG_SIBLING_SOURCE_DIR/pom.xml" ]] \
