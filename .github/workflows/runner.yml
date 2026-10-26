@@ -22,5 +22,7 @@ jobs:
           while IFS= read -r -d '' script; do
             bash -n "$script"
           done < <(find scripts -type f -name '*.sh' -print0)
+      - name: Validate demo execution manifests
+        run: bash scripts/validate-manifests.sh
       - name: Verify pinned-checkout and source-override contracts
         run: bash scripts/test-runner.sh
