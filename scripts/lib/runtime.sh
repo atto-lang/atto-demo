@@ -9,6 +9,10 @@ if [[ -z "$ORESLANG_SOURCE_REF" ]]; then
   echo "Oreslang source revision cannot be empty" >&2
   return 64 2>/dev/null || exit 64
 fi
+if [[ ! "$ORESLANG_SOURCE_REF" =~ ^[0-9a-f]{40}$ ]]; then
+  echo "Oreslang source revision must be an exact 40-character lowercase commit SHA" >&2
+  return 64 2>/dev/null || exit 64
+fi
 ORESLANG_MANAGED_SOURCE_DIR="$ORESLANG_DEMO_ROOT/.cache/oreslang-source.java"
 ORESLANG_SIBLING_SOURCE_DIR="$ORESLANG_DEMO_ROOT/../oreslang-source.java"
 
@@ -47,11 +51,24 @@ ores_prepare_managed_source() {
     fi
   fi
 
+  if ! git -C "$source_dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "managed Oreslang source cache is not a Git worktree: $source_dir" >&2
+    return 65
+  fi
+
   if ! git -C "$source_dir" cat-file -e "$ORESLANG_SOURCE_REF^{commit}" 2>/dev/null; then
-    git -C "$source_dir" fetch --quiet origin "$ORESLANG_SOURCE_REF"
+    git -C "$source_dir" fetch --quiet --no-tags origin "$ORESLANG_SOURCE_REF"
   fi
 
   git -C "$source_dir" checkout --quiet --detach "$ORESLANG_SOURCE_REF"
+  if [[ "$(git -C "$source_dir" rev-parse HEAD)" != "$ORESLANG_SOURCE_REF" ]]; then
+    echo "managed Oreslang source checkout did not resolve to SOURCE_REF" >&2
+    return 65
+  fi
+  if [[ -n "$(git -C "$source_dir" status --porcelain --untracked-files=all)" ]]; then
+    echo "managed Oreslang source checkout is dirty; refusing to execute it" >&2
+    return 65
+  fi
   ORESLANG_RESOLVED_SOURCE_DIR="$source_dir"
   ORESLANG_SOURCE_MODE="managed pinned checkout"
 }
