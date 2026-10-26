@@ -121,4 +121,17 @@ case "$override_output" in
     ;;
 esac
 
+invalid_ref_log="$tmp_root/invalid-ref.log"
+if (
+  cd "$demo"
+  PATH="$bin_dir:$PATH" MVN_LOG="$mvn_log" \
+    ORESLANG_SOURCE_REF_OVERRIDE="not-a-commit" \
+    bash scripts/run.sh examples/00_one.ores
+) >"$invalid_ref_log" 2>&1; then
+  echo "runner accepted a non-SHA source revision" >&2
+  cat "$invalid_ref_log" >&2
+  exit 1
+fi
+grep -q "exact 40-character lowercase commit SHA" "$invalid_ref_log"
+
 echo "runner self-test passed"
