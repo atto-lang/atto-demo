@@ -27,6 +27,10 @@ failed=0
 total="${#examples[@]}"
 
 for example in "${examples[@]}"; do
+  if [[ -L "$example" || ! -f "$example" ]]; then
+    echo "refusing non-regular or symlinked stable example: $example" >&2
+    exit 65
+  fi
   name="$(basename "$example")"
   stdout_file="$tmp_dir/$name.stdout"
   stderr_file="$tmp_dir/$name.stderr"
