@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_root="$(cd "$(dirname "$0")/.." && pwd)"
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+bash "$repo_root/scripts/validate-manifests.sh"
 manifest="$repo_root/examples/features/manifest.tsv"
 
 if [[ ! -f "$manifest" ]]; then
@@ -13,7 +14,7 @@ passed=0
 failed=0
 total=0
 
-tmp_dir="$(mktemp -d "/tmp/oreslang-features.XXXXXX")"
+tmp_dir="$(mktemp -d "${TMPDIR:-/tmp}/oreslang-features.XXXXXX")"
 trap 'rm -rf "$tmp_dir"' EXIT
 
 while IFS=$'\t' read -r name file source_ref mode expected; do
