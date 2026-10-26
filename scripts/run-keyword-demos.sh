@@ -2,6 +2,7 @@
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+bash "$repo_root/scripts/validate-manifests.sh"
 manifest="$repo_root/examples/keywords/manifest.tsv"
 
 if [[ ! -f "$manifest" ]]; then
