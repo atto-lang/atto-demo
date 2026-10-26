@@ -159,7 +159,7 @@ See `docs/callables.md` for the exact split.
 
 `SOURCE_REF` pins the compiler/runtime revision used as the stable baseline for these demos. An adjacent checkout is used only when its `HEAD` exactly matches that pin. The local sibling checkout is never rewritten or checked out automatically; the runner-managed cache is pinned instead.
 
-Set `ORESLANG_SOURCE_DIR` when you intentionally want to test a local compiler/runtime branch rather than the pinned demo baseline.
+Set `ORESLANG_SOURCE_DIR` when you intentionally want to test a local compiler/runtime branch rather than the pinned demo baseline. Explicit source checkouts must be Git worktrees and are required to be clean by default; set `ORESLANG_ALLOW_DIRTY_SOURCE=1` only when intentionally testing uncommitted compiler/runtime changes.
 
 The current pin includes the canonical conditional grammar: `if ...; then / elif ...; then / else / fi`. Legacy conditional `do` remains accepted with a deprecation warning, while loop `do ... done` remains unchanged. The pinned compiler tree was independently validated under GraalVM 25.3 / Java 25 across fast CI, JIT/JVM, native AOT, native hybrid, and polyglot-isolate runs.
 
