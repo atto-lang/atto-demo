@@ -1,3 +1,4 @@
+# Exact-head, source-only integration declaration check; no guest runtime.
 name: Integration manifest claims
 on:
   pull_request:
@@ -13,38 +14,30 @@ jobs:
         with:
           persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      - name: Validate integration metadata and source pin
+      - name: Validate exact checkout, integration contract and immutable source pin
         shell: bash
+        env:
+          EXPECTED_DEMO_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_DEMO_SHA"
           test -f .oreslang/integration.json
           test ! -L .oreslang/integration.json
           test -s .oreslang/integration.json
           test -f SOURCE_REF
           test ! -L SOURCE_REF
-          python3 - <<'PY'
-          import json
-          import re
-          from pathlib import Path
-
-          data = json.loads(Path(".oreslang/integration.json").read_text())
-          expected = {
-              "schemaVersion": 1,
-              "protocol": "oreslang-ecosystem-integration",
-              "repository": "ores-truffle-oreslang/oreslang-demo",
-              "role": "application",
-              "evidence": "not-attested",
-          }
-          for key, value in expected.items():
-              if data.get(key) != value:
-                  raise SystemExit(f"{key}: expected {value!r}, got {data.get(key)!r}")
-          if data.get("upstreams") != ["oreslang-source.java"]:
-              raise SystemExit("unexpected upstream set")
-          source_ref = Path("SOURCE_REF").read_text().strip()
-          if not re.fullmatch(r"[0-9a-f]{40}", source_ref):
-              raise SystemExit("SOURCE_REF must be one full lowercase Git SHA")
-          if "parity" not in data.get("note", "").lower():
-              raise SystemExit("integration note must preserve parity disclaimer")
-          print("INTEGRATION_MANIFEST_PASS")
-          print("evidence=not-attested")
-          PY
+          test "$(wc -l < SOURCE_REF)" -eq 1
+          test "$(wc -c < SOURCE_REF)" -eq 41
+          grep -Eq '^[0-9a-f]{40}$' SOURCE_REF
+          jq -e '
+            (.schemaVersion == 1) and
+            (.protocol == "oreslang-ecosystem-integration") and
+            (.repository == "ores-truffle-oreslang/oreslang-demo") and
+            (.role == "application") and
+            (.upstreams == ["oreslang-source.java"]) and
+            (.evidence == "not-attested") and
+            ((.note | type) == "string") and
+            (.note | ascii_downcase | contains("parity"))
+          ' .oreslang/integration.json
+          echo 'INTEGRATION_MANIFEST_PASS evidence=not-attested'
+          echo 'SOURCE_ONLY: no Oreslang compiler or guest executed'
