@@ -1,0 +1,50 @@
+name: Integration manifest claims
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Validate integration metadata and source pin
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f .oreslang/integration.json
+          test ! -L .oreslang/integration.json
+          test -s .oreslang/integration.json
+          test -f SOURCE_REF
+          test ! -L SOURCE_REF
+          python3 - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+
+          data = json.loads(Path(".oreslang/integration.json").read_text())
+          expected = {
+              "schemaVersion": 1,
+              "protocol": "oreslang-ecosystem-integration",
+              "repository": "ores-truffle-oreslang/oreslang-demo",
+              "role": "application",
+              "evidence": "not-attested",
+          }
+          for key, value in expected.items():
+              if data.get(key) != value:
+                  raise SystemExit(f"{key}: expected {value!r}, got {data.get(key)!r}")
+          if data.get("upstreams") != ["oreslang-source.java"]:
+              raise SystemExit("unexpected upstream set")
+          source_ref = Path("SOURCE_REF").read_text().strip()
+          if not re.fullmatch(r"[0-9a-f]{40}", source_ref):
+              raise SystemExit("SOURCE_REF must be one full lowercase Git SHA")
+          if "parity" not in data.get("note", "").lower():
+              raise SystemExit("integration note must preserve parity disclaimer")
+          print("INTEGRATION_MANIFEST_PASS")
+          print("evidence=not-attested")
+          PY
