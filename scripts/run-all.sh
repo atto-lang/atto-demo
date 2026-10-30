@@ -15,6 +15,10 @@ if [[ ! -e "${examples[0]}" ]]; then
   exit 66
 fi
 
+for example in "${examples[@]}"; do
+  ores_validate_example "$example"
+done
+
 echo "==> Building Oreslang runtime..."
 ores_build_runtime
 echo "BUILD PASS"

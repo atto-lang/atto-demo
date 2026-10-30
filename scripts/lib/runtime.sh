@@ -99,8 +99,22 @@ ores_build_runtime() {
     compile
 }
 
+ores_validate_example() {
+  local example="$1"
+
+  if [[ -L "$example" || ! -f "$example" ]]; then
+    echo "refusing non-regular or symlinked example: $example" >&2
+    return 66
+  fi
+  if [[ "$example" != *.ores ]]; then
+    echo "refusing non-Oreslang example: $example" >&2
+    return 65
+  fi
+}
+
 ores_exec_example() {
   local example="$1"
+  ores_validate_example "$example" || return $?
 
   mvn -B -ntp -q -e \
     -f "$ORESLANG_RESOLVED_SOURCE_DIR/pom.xml" \
