@@ -17,10 +17,7 @@ else
   example="$repo_root/$input"
 fi
 
-if [[ ! -f "$example" ]]; then
-  echo "example not found: $example" >&2
-  exit 66
-fi
+ores_validate_example "$example"
 
 ores_require_tools
 ores_resolve_source
