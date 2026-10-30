@@ -121,4 +121,23 @@ case "$override_output" in
     ;;
 esac
 
+ln -s "$demo/examples/00_one.ores" "$demo/examples/02_link.ores"
+if (
+  cd "$demo"
+  PATH="$bin_dir:$PATH" MVN_LOG="$mvn_log" bash scripts/run.sh examples/02_link.ores
+) >/dev/null 2>&1; then
+  echo "runner accepted a symlinked example" >&2
+  exit 1
+fi
+rm "$demo/examples/02_link.ores"
+
+printf 'not oreslang\n' > "$demo/examples/not-oreslang.txt"
+if (
+  cd "$demo"
+  PATH="$bin_dir:$PATH" MVN_LOG="$mvn_log" bash scripts/run.sh examples/not-oreslang.txt
+) >/dev/null 2>&1; then
+  echo "runner accepted a non-.ores example" >&2
+  exit 1
+fi
+
 echo "runner self-test passed"
