@@ -1,0 +1,33 @@
+name: Demo source inventory gate
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-inventory:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Reject invalid source pin and non-regular examples
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$(tr -d '\n' < SOURCE_REF)" =~ ^[0-9a-f]{40}$ ]]
+          while IFS= read -r -d '' file; do
+            test -f "$file"
+            test ! -L "$file"
+          done < <(find examples -name '*.ores' -print0)
+          test "$(find examples -type f -name '*.ores' | wc -l)" -ge 15
+      - name: Validate tracked TSV contract inventories
+        shell: bash
+        run: |
+          set -euo pipefail
+          for manifest in examples/keywords/manifest.tsv examples/features/manifest.tsv; do
+            test -s "$manifest"
+            test ! -L "$manifest"
+            ! grep -n $'\r' "$manifest"
+          done
