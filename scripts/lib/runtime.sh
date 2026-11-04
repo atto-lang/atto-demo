@@ -106,8 +106,8 @@ ores_validate_example() {
     echo "refusing non-regular or symlinked example: $example" >&2
     return 66
   fi
-  if [[ "$example" != *.ores ]]; then
-    echo "refusing non-Oreslang example: $example" >&2
+  if [[ "$example" != *.ores && "$example" != *.atto ]]; then
+    echo "refusing non-.atto/.ores example: $example" >&2
     return 65
   fi
 }
