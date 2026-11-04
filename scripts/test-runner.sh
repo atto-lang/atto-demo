@@ -181,4 +181,83 @@ if (
 fi
 rm "$demo/examples/new.ores"
 
+# This harness uses a fake Maven executable only to test runner admission.
+# A matching printed HEAD is not sufficient evidence of compiled guest behavior.
+expect_source_rejection() {
+  local scenario="$1" diagnostic="$2"
+  shift 2
+  local before result
+  before="$(wc -l < "$mvn_log")"
+  if result="$(
+    cd "$demo"
+    PATH="$bin_dir:$PATH" MVN_LOG="$mvn_log" "$@" 2>&1
+  )"; then
+    echo "runner source-policy false acceptance: $scenario" >&2
+    exit 1
+  fi
+  if [[ "$result" != *"$diagnostic"* ]]; then
+    echo "runner rejected $scenario for wrong reason; expected $diagnostic" >&2
+    printf '%s\n' "$result" >&2
+    exit 1
+  fi
+  if [[ "$(wc -l < "$mvn_log")" != "$before" ]]; then
+    echo "runner invoked Maven before rejecting source: $scenario" >&2
+    exit 1
+  fi
+  echo "SOURCE_REJECTION_VERIFIED=$scenario"
+}
+
+# A caller-specified source directory must not bypass the exact SHA pin.
+expect_source_rejection explicit-wrong-head 'selected HEAD differs from SOURCE_REF' \
+  env ORESLANG_SOURCE_DIR="$source_repo" bash scripts/run.sh examples/00_one.ores
+expect_source_rejection malformed-override 'invalid source revision' \
+  env ORESLANG_SOURCE_REF_OVERRIDE='--version' bash scripts/run.sh examples/00_one.ores
+expect_source_rejection short-override 'invalid source revision' \
+  env ORESLANG_SOURCE_REF_OVERRIDE=abcd bash scripts/run.sh examples/00_one.ores
+
+# Valid explicit checkout remains supported when it is exact-head and clean.
+valid_explicit="$(
+  cd "$demo"
+  PATH="$bin_dir:$PATH" MVN_LOG="$mvn_log" \
+    ORESLANG_SOURCE_DIR="$demo/.cache/oreslang-source.java" \
+    bash scripts/run.sh examples/00_one.ores
+)"
+case "$valid_explicit" in
+  *"ATTO_DEMO_PINNED_SOURCE_VERIFIED=$pinned_ref"*"output:00_one.ores"*"PASS"*) ;;
+  *) echo "runner broke legitimate exact-head explicit checkout" >&2; exit 1 ;;
+esac
+
+# Neither tracked modifications nor new files may be laundered through the
+# explicit-directory path. Both must reject *before* fake Maven is invoked.
+cache="$demo/.cache/oreslang-source.java"
+printf '<!-- altered -->\n' >> "$cache/pom.xml"
+expect_source_rejection explicit-dirty-tracked 'dirty source checkout' \
+  env ORESLANG_SOURCE_DIR="$cache" bash scripts/run.sh examples/00_one.ores
+git -C "$cache" checkout -- pom.xml
+printf 'untracked source\n' > "$cache/rogue.atto"
+expect_source_rejection explicit-dirty-untracked 'dirty source checkout' \
+  env ORESLANG_SOURCE_DIR="$cache" bash scripts/run.sh examples/00_one.ores
+rm "$cache/rogue.atto"
+
+# SOURCE_REF itself must be a regular one-line file, not a symlink or a
+# whitespace-normalized value that transforms arbitrary input into a SHA.
+printf '%s  \n' "$pinned_ref" > "$demo/SOURCE_REF"
+expect_source_rejection padded-ref 'invalid SOURCE_REF' \
+  bash scripts/run.sh examples/00_one.ores
+printf '%s\n' "$pinned_ref" > "$demo/SOURCE_REF"
+mv "$demo/SOURCE_REF" "$demo/SOURCE_REF.pinned"
+ln -s SOURCE_REF.pinned "$demo/SOURCE_REF"
+expect_source_rejection symlink-ref 'invalid SOURCE_REF' \
+  bash scripts/run.sh examples/00_one.ores
+rm "$demo/SOURCE_REF"
+mv "$demo/SOURCE_REF.pinned" "$demo/SOURCE_REF"
+
+# A matching adjacent HEAD but modified compiler file must not satisfy pin.
+git -C "$source_repo" checkout --quiet --detach "$pinned_ref"
+printf '<!-- sibling dirty -->\n' >> "$source_repo/pom.xml"
+expect_source_rejection adjacent-dirty-tracked 'dirty source checkout' \
+  bash scripts/run.sh examples/00_one.ores
+git -C "$source_repo" checkout -- pom.xml
+git -C "$source_repo" checkout --quiet --detach "$sibling_head"
+
 echo "runner self-test passed"
