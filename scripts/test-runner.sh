@@ -161,4 +161,24 @@ if (
 fi
 rm "$demo/examples/link.atto"
 
+# run-all must discover both migration suffixes and fail closed on a
+# conflicting basename rather than compiling whichever happens to sort first.
+all_with_atto="$(
+  cd "$demo"
+  PATH="$bin_dir:$PATH" MVN_LOG="$mvn_log" bash scripts/run-all.sh
+)"
+case "$all_with_atto" in
+  *"output:new.atto"*"3/3 demos passed"*) ;;
+  *) echo "run-all failed to enumerate canonical .atto example" >&2; exit 1 ;;
+esac
+printf 'legacy collision\n' > "$demo/examples/new.ores"
+if (
+  cd "$demo"
+  PATH="$bin_dir:$PATH" MVN_LOG="$mvn_log" bash scripts/run-all.sh
+) >/dev/null 2>&1; then
+  echo "run-all accepted conflicting .atto and .ores stems" >&2
+  exit 1
+fi
+rm "$demo/examples/new.ores"
+
 echo "runner self-test passed"
