@@ -9,14 +9,25 @@ ores_require_tools
 ores_resolve_source
 ores_print_source
 
-examples=("$repo_root"/examples/*.ores)
-if [[ ! -e "${examples[0]}" ]]; then
-  echo "no .ores examples found under $repo_root/examples" >&2
+# Resolve the migration suffixes without leaving literal unmatched glob patterns.
+# A same-stem .atto/.ores pair is ambiguous; never silently pick one.
+shopt -s nullglob
+examples=("$repo_root"/examples/*.atto "$repo_root"/examples/*.ores)
+shopt -u nullglob
+if (( ${#examples[@]} == 0 )); then
+  echo "no .atto or .ores examples found under $repo_root/examples" >&2
   exit 66
 fi
 
+declare -A seen_stems=()
 for example in "${examples[@]}"; do
   ores_validate_example "$example"
+  stem="${example%.*}"
+  if [[ -n "${seen_stems[$stem]+present}" ]]; then
+    echo "ambiguous .atto/.ores example stem: $stem" >&2
+    exit 65
+  fi
+  seen_stems[$stem]=1
 done
 
 echo "==> Building Oreslang runtime..."
