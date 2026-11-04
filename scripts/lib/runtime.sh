@@ -4,9 +4,29 @@
 # This file is sourced by run.sh and run-all.sh.
 
 ORESLANG_DEMO_ROOT="${ORESLANG_DEMO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
-ORESLANG_SOURCE_REF="${ORESLANG_SOURCE_REF_OVERRIDE:-$(tr -d '[:space:]' < "$ORESLANG_DEMO_ROOT/SOURCE_REF")}"
-if [[ -z "$ORESLANG_SOURCE_REF" ]]; then
-  echo "Oreslang source revision cannot be empty" >&2
+# A SHA pin is a security input. Never silently strip characters from it.
+# Ignore caller-supplied Git indirection when verifying compiler provenance.
+unset GIT_DIR GIT_WORK_TREE GIT_COMMON_DIR GIT_INDEX_FILE GIT_OBJECT_DIRECTORY
+unset GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_NAMESPACE GIT_GRAFT_FILE GIT_REPLACE_REF_BASE
+export GIT_NO_REPLACE_OBJECTS=1
+if [[ -n "${ORESLANG_SOURCE_REF_OVERRIDE:-}" ]]; then
+  ORESLANG_SOURCE_REF="$ORESLANG_SOURCE_REF_OVERRIDE"
+else
+  ref_file="$ORESLANG_DEMO_ROOT/SOURCE_REF"
+  if [[ ! -f "$ref_file" || -L "$ref_file" ]] ||
+     [[ "$(wc -c < "$ref_file")" -ne 41 ]] ||
+     [[ "$(wc -l < "$ref_file")" -ne 1 ]] ||
+     ! grep -Eq '^[0-9a-f]{40}$' "$ref_file"; then
+    echo "invalid SOURCE_REF: require one regular 40-hex SHA plus newline" >&2
+    return 64 2>/dev/null || exit 64
+  fi
+  IFS= read -r ORESLANG_SOURCE_REF < "$ref_file" || {
+    echo "unable to read SOURCE_REF" >&2
+    return 64 2>/dev/null || exit 64
+  }
+fi
+if [[ ! "$ORESLANG_SOURCE_REF" =~ ^[0-9a-f]{40}$ ]]; then
+  echo "invalid source revision: require exactly 40 lowercase hex characters" >&2
   return 64 2>/dev/null || exit 64
 fi
 ORESLANG_MANAGED_SOURCE_DIR="$ORESLANG_DEMO_ROOT/.cache/oreslang-source.java"
@@ -56,6 +76,43 @@ ores_prepare_managed_source() {
   ORESLANG_SOURCE_MODE="managed pinned checkout"
 }
 
+# All source resolution paths, including explicit ORESLANG_SOURCE_DIR, must
+# bind the exact pinned commit and reject dirty tracked/untracked source.
+ores_verify_resolved_source() {
+  local source_dir="$1" physical_root="" git_root="" actual_head=""
+  if [[ ! -d "$source_dir/.git" || -L "$source_dir/.git" ||
+        ! -f "$source_dir/pom.xml" || -L "$source_dir/pom.xml" ]]; then
+    echo "source provenance failure: expected regular checkout and pom.xml" >&2
+    return 65
+  fi
+  physical_root="$(cd "$source_dir" && pwd -P)" || return 65
+  git_root="$(git -C "$physical_root" rev-parse --show-toplevel 2>/dev/null)" || {
+    echo "source provenance failure: invalid Git worktree" >&2
+    return 65
+  }
+  if [[ "$git_root" != "$physical_root" ]]; then
+    echo "source provenance failure: source directory must be Git root" >&2
+    return 65
+  fi
+  actual_head="$(git -C "$physical_root" rev-parse --verify 'HEAD^{commit}' 2>/dev/null)" || {
+    echo "source provenance failure: missing Git HEAD" >&2
+    return 65
+  }
+  if [[ "$actual_head" != "$ORESLANG_SOURCE_REF" ]]; then
+    echo "source provenance failure: selected HEAD differs from SOURCE_REF" >&2
+    return 65
+  fi
+  if ! git -C "$physical_root" diff --no-ext-diff --quiet HEAD -- ||
+     ! git -C "$physical_root" diff --no-ext-diff --cached --quiet HEAD -- ||
+     [[ -n "$(git -C "$physical_root" ls-files --others --exclude-standard --)" ]]; then
+    echo "source provenance failure: dirty source checkout" >&2
+    return 65
+  fi
+  ORESLANG_RESOLVED_SOURCE_DIR="$physical_root"
+  ORESLANG_RESOLVED_SOURCE_REVISION="$actual_head"
+  echo "ATTO_DEMO_PINNED_SOURCE_VERIFIED=$actual_head"
+}
+
 ores_resolve_source() {
   local sibling_head=""
 
@@ -84,7 +141,7 @@ ores_resolve_source() {
     ores_prepare_managed_source || return $?
   fi
 
-  ORESLANG_RESOLVED_SOURCE_REVISION="$(git -C "$ORESLANG_RESOLVED_SOURCE_DIR" rev-parse HEAD 2>/dev/null || printf 'local/unversioned')"
+  ores_verify_resolved_source "$ORESLANG_RESOLVED_SOURCE_DIR" || return $?
 }
 
 ores_print_source() {
