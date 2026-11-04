@@ -121,7 +121,7 @@ ores_verify_resolved_source() {
   fi
   ORESLANG_RESOLVED_SOURCE_DIR="$physical_root"
   ORESLANG_RESOLVED_SOURCE_REVISION="$actual_head"
-  echo "ATTO_DEMO_PINNED_SOURCE_VERIFIED=$actual_head"
+  echo "ATTO_DEMO_CLEAN_HEAD_MATCH=$actual_head"
 }
 
 ores_resolve_source() {
