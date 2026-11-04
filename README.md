@@ -49,6 +49,18 @@ bash scripts/run-feature-demos.sh
 Like the keyword contracts, every feature row pins the exact source revision it
 expects.
 
+## AttoLang source-extension migration
+
+New AttoLang source files use `.atto`; existing pinned demo fixtures use
+legacy `.ores` until they are individually recompiled and revalidated.
+`scripts/run.sh` accepts either suffix and rejects other extensions and
+symlinks. Extension admission only selects a file for the compiler; it is
+**not** proof that the older pinned compiler in `SOURCE_REF` can parse
+modern AttoLang. To test an updated compiler, explicitly set
+`ORESLANG_SOURCE_DIR` to its checkout and record its exact revision.
+The runner self-test uses a fake Maven executable and only proves that
+`.atto` paths are passed through unchanged.
+
 ## Quick start
 
 Requirements:
