@@ -140,4 +140,25 @@ if (
   exit 1
 fi
 
+# Canonical AttoLang inputs must travel through the same pinned runner path.
+# This fake-Maven test proves argument transport only, not compiler acceptance.
+printf 'canonical AttoLang example\n' > "$demo/examples/new.atto"
+atto_output="$(
+  cd "$demo"
+  PATH="$bin_dir:$PATH" MVN_LOG="$mvn_log" bash scripts/run.sh examples/new.atto
+)"
+case "$atto_output" in
+  *"output:new.atto"*"PASS"*) ;;
+  *) echo "runner failed .atto argument transport" >&2; exit 1 ;;
+esac
+ln -s "$demo/examples/new.atto" "$demo/examples/link.atto"
+if (
+  cd "$demo"
+  PATH="$bin_dir:$PATH" MVN_LOG="$mvn_log" bash scripts/run.sh examples/link.atto
+) >/dev/null 2>&1; then
+  echo "runner accepted symlinked .atto example" >&2
+  exit 1
+fi
+rm "$demo/examples/link.atto"
+
 echo "runner self-test passed"
