@@ -230,6 +230,22 @@ case "$valid_explicit" in
   *) echo "runner broke legitimate exact-head explicit checkout" >&2; exit 1 ;;
 esac
 
+# Caller-controlled Git variables must not redirect the source audit to a
+# fake .git directory, index, or injected fsmonitor configuration.
+valid_poisoned_environment="$(
+  cd "$demo"
+  PATH="$bin_dir:$PATH" MVN_LOG="$mvn_log" \
+    GIT_DIR="$tmp_root/missing-fake-git-dir" \
+    GIT_INDEX_FILE="$tmp_root/forged-index" \
+    GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.fsmonitor GIT_CONFIG_VALUE_0=true \
+    ORESLANG_SOURCE_DIR="$demo/.cache/oreslang-source.java" \
+    bash scripts/run.sh examples/00_one.ores
+)"
+case "$valid_poisoned_environment" in
+  *"ATTO_DEMO_CLEAN_HEAD_MATCH=$pinned_ref"*"output:00_one.ores"*"PASS"*) ;;
+  *) echo "caller Git environment redirected pinned source verification" >&2; exit 1 ;;
+esac
+
 # Neither tracked modifications nor new files may be laundered through the
 # explicit-directory path. Both must reject *before* fake Maven is invoked.
 cache="$demo/.cache/oreslang-source.java"
