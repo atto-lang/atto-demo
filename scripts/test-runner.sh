@@ -226,7 +226,7 @@ valid_explicit="$(
     bash scripts/run.sh examples/00_one.ores
 )"
 case "$valid_explicit" in
-  *"ATTO_DEMO_PINNED_SOURCE_VERIFIED=$pinned_ref"*"output:00_one.ores"*"PASS"*) ;;
+  *"ATTO_DEMO_CLEAN_HEAD_MATCH=$pinned_ref"*"output:00_one.ores"*"PASS"*) ;;
   *) echo "runner broke legitimate exact-head explicit checkout" >&2; exit 1 ;;
 esac
 
