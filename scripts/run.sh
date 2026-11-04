@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [[ $# -ne 1 ]]; then
-  echo "usage: bash scripts/run.sh <example.ores>" >&2
+  echo "usage: bash scripts/run.sh <example.atto|example.ores>" >&2
   exit 64
 fi
 
