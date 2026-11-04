@@ -54,6 +54,9 @@ for arg in "$@"; do
       ;;
   esac
 done
+if [[ "${MUTATE_SOURCE_ON_COMPILE:-0}" == 1 && "${*: -1}" == compile ]]; then
+  printf '<!-- unexpected compiler source change -->\n' >> "$SOURCE_REPO_TO_MUTATE/pom.xml"
+fi
 MVN
 chmod +x "$bin_dir/mvn"
 
@@ -259,5 +262,38 @@ expect_source_rejection adjacent-dirty-tracked 'dirty source checkout' \
   bash scripts/run.sh examples/00_one.ores
 git -C "$source_repo" checkout -- pom.xml
 git -C "$source_repo" checkout --quiet --detach "$sibling_head"
+
+# A Git-ignored generated Atto source under src/ still affects a compiler
+# input path. Ordinary 'git status' misses it, but the source inventory must not.
+mkdir -p "$cache/src"
+printf 'src/ignored.atto\n' >> "$cache/.git/info/exclude"
+printf 'ignored guest source\n' > "$cache/src/ignored.atto"
+expect_source_rejection explicit-ignored-source 'dirty source checkout' \
+  env ORESLANG_SOURCE_DIR="$cache" bash scripts/run.sh examples/00_one.ores
+rm -f "$cache/src/ignored.atto"
+rmdir "$cache/src"
+: > "$cache/.git/info/exclude"
+
+# Mutations between Maven compile and exec must be caught by a *second*
+# identity validation, not only by the initial command's SOURCE_REF check.
+before_recheck="$(wc -l < "$mvn_log")"
+if late_result="$(
+  cd "$demo"
+  PATH="$bin_dir:$PATH" MVN_LOG="$mvn_log" \
+    MUTATE_SOURCE_ON_COMPILE=1 SOURCE_REPO_TO_MUTATE="$cache" \
+    ORESLANG_SOURCE_DIR="$cache" \
+    bash scripts/run.sh examples/00_one.ores 2>&1
+)"; then
+  echo "runner executed after source was modified between build and exec" >&2
+  exit 1
+fi
+if [[ "$late_result" != *'dirty source checkout'* ]] ||
+   [[ "$(wc -l < "$mvn_log")" -ne $(( before_recheck + 1 )) ]]; then
+  echo "runner failed late mutation admission check or invoked guest Maven" >&2
+  printf '%s\n' "$late_result" >&2
+  exit 1
+fi
+git -C "$cache" checkout -- pom.xml
+echo "SOURCE_REJECTION_VERIFIED=postcompile-mutation"
 
 echo "runner self-test passed"
