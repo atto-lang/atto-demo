@@ -102,9 +102,20 @@ ores_verify_resolved_source() {
     echo "source provenance failure: selected HEAD differs from SOURCE_REF" >&2
     return 65
   fi
+  local untracked="" ignored_source=""
+  untracked="$(git -C "$physical_root" ls-files --others --exclude-standard --)" || {
+    echo "source provenance failure: unreadable Git source inventory" >&2
+    return 65
+  }
+  # Maven compiles source under src and the language libraries; even ignored
+  # untracked source files must not be silently added to an exact-HEAD build.
+  ignored_source="$(git -C "$physical_root" ls-files --others -- src stdlib core)" || {
+    echo "source provenance failure: unreadable source directory inventory" >&2
+    return 65
+  }
   if ! git -C "$physical_root" diff --no-ext-diff --quiet HEAD -- ||
      ! git -C "$physical_root" diff --no-ext-diff --cached --quiet HEAD -- ||
-     [[ -n "$(git -C "$physical_root" ls-files --others --exclude-standard --)" ]]; then
+     [[ -n "$untracked" || -n "$ignored_source" ]]; then
     echo "source provenance failure: dirty source checkout" >&2
     return 65
   fi
@@ -150,6 +161,8 @@ ores_print_source() {
 }
 
 ores_build_runtime() {
+  # Reduce check/build TOCTOU: validate immediately before invoking Maven.
+  ores_verify_resolved_source "$ORESLANG_RESOLVED_SOURCE_DIR" >/dev/null || return $?
   mvn -B -ntp -q -e \
     -f "$ORESLANG_RESOLVED_SOURCE_DIR/pom.xml" \
     -DskipTests \
@@ -172,6 +185,7 @@ ores_validate_example() {
 ores_exec_example() {
   local example="$1"
   ores_validate_example "$example" || return $?
+  ores_verify_resolved_source "$ORESLANG_RESOLVED_SOURCE_DIR" >/dev/null || return $?
 
   mvn -B -ntp -q -e \
     -f "$ORESLANG_RESOLVED_SOURCE_DIR/pom.xml" \
