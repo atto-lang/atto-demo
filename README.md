@@ -54,7 +54,9 @@ expects.
 New AttoLang source files use `.atto`; existing pinned demo fixtures use
 legacy `.ores` until they are individually recompiled and revalidated.
 `scripts/run.sh` accepts either suffix and rejects other extensions and
-symlinks. Extension admission only selects a file for the compiler; it is
+symlinks. `scripts/run-all.sh` enumerates both suffixes and rejects
+same-stem `.atto`/`.ores` pairs as ambiguous. Extension admission only
+selects a file for the compiler; it is
 **not** proof that the older pinned compiler in `SOURCE_REF` can parse
 modern AttoLang. To test an updated compiler, explicitly set
 `ORESLANG_SOURCE_DIR` to its checkout and record its exact revision.
