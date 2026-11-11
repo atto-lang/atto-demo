@@ -14,10 +14,10 @@ need mktemp
 need grep
 need wc
 
-repo="$(cd "$(dirname "\${BASH_SOURCE[0]}")/.." && pwd -P)"
+repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 [[ "$(git -C "$repo" rev-parse --show-toplevel 2>/dev/null)" == "$repo" ]] || fail "demo Git root mismatch"
 [[ -z "$(git -C "$repo" status --porcelain --untracked-files=all)" ]] || fail "dirty demo checkout"
-if [[ -n "\${ATTO_EXPECTED_DEMO_HEAD:-}" ]]; then
+if [[ -n "${ATTO_EXPECTED_DEMO_HEAD:-}" ]]; then
   [[ "$ATTO_EXPECTED_DEMO_HEAD" =~ ^[0-9a-f]{40}$ ]] || fail "invalid expected demo head"
   [[ "$(git -C "$repo" rev-parse HEAD)" == "$ATTO_EXPECTED_DEMO_HEAD" ]] || fail "wrong demo head"
 fi
@@ -27,7 +27,7 @@ manifest="$repo/conformance/atto-scalar-v1/manifest.tsv"
 pin="$(cat "$repo/conformance/atto-scalar-v1/SOURCE_REF")"
 [[ "$pin" =~ ^[a-f0-9]{40}$ ]] || fail "invalid compiler pin"
 
-[[ -n "\${ATTO_JAVA_SOURCE_DIR:-}" ]] || fail "set ATTO_JAVA_SOURCE_DIR to an already authorized compiler checkout"
+[[ -n "${ATTO_JAVA_SOURCE_DIR:-}" ]] || fail "set ATTO_JAVA_SOURCE_DIR to an already authorized compiler checkout"
 [[ -d "$ATTO_JAVA_SOURCE_DIR" && ! -L "$ATTO_JAVA_SOURCE_DIR" ]] || fail "compiler source not a physical directory"
 source_dir="$(cd "$ATTO_JAVA_SOURCE_DIR" && pwd -P)" || fail "invalid compiler source path"
 [[ -f "$source_dir/pom.xml" && ! -L "$source_dir/pom.xml" ]] || fail "regular compiler pom.xml required"
@@ -44,7 +44,7 @@ assert_source_identity() {
 }
 assert_source_identity
 
-tmp="$(mktemp -d "\${TMPDIR:-/tmp}/atto-java-guest.XXXXXXXX")"
+tmp="$(mktemp -d "${TMPDIR:-/tmp}/atto-java-guest.XXXXXXXX")"
 trap 'rm -rf "$tmp"' EXIT
 demo_head="$(git -C "$repo" rev-parse HEAD)"
 demo_tree="$(git -C "$repo" rev-parse 'HEAD^{tree}')"
