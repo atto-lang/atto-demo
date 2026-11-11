@@ -24,7 +24,11 @@ jobs:
           git diff --cached --quiet
           echo "HEAD=$EXPECTED_SHA TREE=$(git rev-parse 'HEAD^{tree}')"
       - name: Check new source-only script syntax
-        run: bash -n ci/check-atto-scalar-v1.sh
+        run: |
+          bash -n ci/check-atto-scalar-v1.sh
+          bash -n ci/test-atto-scalar-v1.sh
+      - name: Run adversarial six-fixture source regressions
+        run: bash ci/test-atto-scalar-v1.sh
       - name: Verify reviewed upstream byte identities
         run: bash ci/check-atto-scalar-v1.sh
       - name: Verify entire language source catalog

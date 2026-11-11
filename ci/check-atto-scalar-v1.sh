@@ -20,6 +20,7 @@ for f in "$pin" "$upstream"; do
 done
 [[ "$(cat "$upstream")" == 43c4d295a237e483f70722bd90ec10d273b73854 ]] || fail "unexpected upstream manifest blob"
 [[ "$(cat "$pin")" == 6d8eb70048eafc9a84c5aebe9c1bb06104f16e76 ]] || fail "unexpected Java pin"
+[[ "$(git hash-object -- "$manifest")" == aef423001dcdb296b4102f8197fab273f14bd0cf ]] || fail "reviewed manifest bytes diverged"
 declare -A seen=()
 positive=0 negative=0 total=0
 while IFS= read -r line || [[ -n "$line" ]]; do
