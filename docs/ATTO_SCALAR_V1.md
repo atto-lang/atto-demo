@@ -13,3 +13,18 @@ bash ci/check-semantic-coverage.sh
 These scripts verify source identity and inventory only; they **do not** compile or execute guests. Do not claim AOT correctness. The Java upstream test `AttoScalarV1GuestTest` verifies parser/linked-source admission for positives, and selected negative compiler rejection, but not numeric runtime results. Future real tests must target **these demo-local files** at the pinned compiler head, record exact compiler/demo SHA and tree, toolchain, actual binary hash, stdout/stderr, exit, negative diagnostic family, runner ID/attempt, nonzero executed steps, and reviewer.
 
 This branch is stacked on coverage-index PR #38; the legacy `.ores` baseline and pinned `SOURCE_REF` are unchanged. Track larger ownership/classes/generics/closures/tuple conformance in issues #39/#40. Never export private compiler source to a different org without approved policy and exact-tree/blob identity.
+
+## Real compiler and guest execution (requires an authorized local checkout)
+
+```sh
+# In an environment with Java/GraalVM, Maven, Git, and an existing clean compiler checkout:
+ATTO_JAVA_SOURCE_DIR=/absolute/path/to/oreslang-source.java \\
+  ATTO_EXPECTED_DEMO_HEAD=$(git rev-parse HEAD) \\
+  bash ci/run-atto-scalar-java.sh
+```
+
+This runner does **not** clone or download the private compiler. It requires its checkout to be at the exact SHA in `conformance/atto-scalar-v1/SOURCE_REF`, verifies source cleanliness before and after builds and each case, checks the source-only gates, compiles the actual Java runtime using Maven, constructs the runtime dependency classpath, and runs the real `dev.oreslang.launcher.OresMain` in a distinct `java` process.
+
+The `--check` pass is separate from executing valid programs; valid programs must actually exit with their manifest's value (`42`, `14`, `42`). Invalid programs must produce compiler failure exit `1` with a relevant operator/mutability diagnostic; process exit `2` or a generic source-not-found error cannot count. No fake Maven, mocked Java executable, or Bash-only result can satisfy this lane. Collect its exact output and JDK/Maven identifiers in the CI receipt, then verify the job had an assigned runner and **nonzero steps**. The source-only workflow does not invoke this runner because it has no authorized private compiler checkout.
+
+**Current evidence remains NOT_EXECUTED for this real guest runner.** The CLI may expose previously untested `fnc main` execution or rejection-diagnostic differences; resolve any findings against the pinned compiler before relaxing the oracle. No AOT or other-backend claim follows from this JVM test.
