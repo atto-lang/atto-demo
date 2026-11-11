@@ -51,8 +51,8 @@ demo_tree="$(git -C "$repo" rev-parse 'HEAD^{tree}')"
 source_tree="$(git -C "$source_dir" rev-parse 'HEAD^{tree}')"
 printf 'ATTO_JAVA_GUEST_START demo=%s demo_tree=%s compiler=%s compiler_tree=%s\n' \
   "$demo_head" "$demo_tree" "$pin" "$source_tree"
-java -version 2>&1 | head -n 3
-mvn -version | head -n 3
+java -version 2>&1
+mvn -version
 
 # Build from source, never trust a pre-existing target/classes or an exec:java stub.
 if ! mvn -B -ntp -q -f "$source_dir/pom.xml" -DskipTests compile >"$tmp/build.out" 2>"$tmp/build.err"; then
@@ -118,7 +118,7 @@ while IFS=$'\t' read -r id kind rel blob oracle; do
     case "$id" in
       removed-modulo) expected_pattern='[%]' ;;
       removed-caret) expected_pattern='[\^]' ;;
-      type-first-reassignment) expected_pattern='immutab|read.?only|cannot assign|reassign|not mutable|non.mutable|not assignable' ;;
+      type-first-reassignment) expected_pattern='immutab|read.?only|cannot[[:space:]]+(reassign|assign)|not mutable|non.mutable|not assignable' ;;
       *) fail "unexpected negative fixture: $id" ;;
     esac
     if [[ "$check_status" -eq 1 ]] && grep -Eiq "$expected_pattern" "$check_err"; then
