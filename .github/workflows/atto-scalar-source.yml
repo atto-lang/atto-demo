@@ -27,6 +27,7 @@ jobs:
         run: |
           bash -n ci/check-atto-scalar-v1.sh
           bash -n ci/test-atto-scalar-v1.sh
+          bash -n ci/run-atto-scalar-java.sh
       - name: Run adversarial six-fixture source regressions
         run: bash ci/test-atto-scalar-v1.sh
       - name: Verify reviewed upstream byte identities

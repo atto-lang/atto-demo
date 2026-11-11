@@ -18,8 +18,8 @@ This branch is stacked on coverage-index PR #38; the legacy `.ores` baseline and
 
 ```sh
 # In an environment with Java/GraalVM, Maven, Git, and an existing clean compiler checkout:
-ATTO_JAVA_SOURCE_DIR=/absolute/path/to/oreslang-source.java \\
-  ATTO_EXPECTED_DEMO_HEAD=$(git rev-parse HEAD) \\
+ATTO_JAVA_SOURCE_DIR=/absolute/path/to/oreslang-source.java \
+  ATTO_EXPECTED_DEMO_HEAD=$(git rev-parse HEAD) \
   bash ci/run-atto-scalar-java.sh
 ```
 
