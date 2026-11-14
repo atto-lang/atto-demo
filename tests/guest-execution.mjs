@@ -1,6 +1,5 @@
 // Optional native compiler + executable WebAssembly guest conformance test.
 // This is not part of host-only catalog tests: set ATTOC and ATTO_COMPILER_HEAD.
-// Private carrier integration. Run real guest Wasm, never label host-only checks as guest execution.
 import assert from 'node:assert/strict';
 import {readFileSync, mkdtempSync, rmSync, existsSync} from 'node:fs';
 import {join, resolve} from 'node:path';
@@ -12,7 +11,7 @@ const attoc=resolve(process.env.ATTOC||'missing-attoc');
 const hex=/^[a-f0-9]{40}$/;
 assert.ok(hex.test(process.env.ATTO_COMPILER_HEAD||''),'ATTO_COMPILER_HEAD must pin a 40-digit source commit');
 assert.ok(existsSync(attoc), 'compiled native attoc unavailable');
-const manifest=JSON.parse(readFileSync(join(root,'examples/manifest.json','utf8'));
+const manifest=JSON.parse(readFileSync(join(root,'examples/manifest.json'),'utf8'));
 assert.equal(manifest.schema,'atto.demo.examples.v1');
 assert.equal(manifest.examples.length,2);
 const decoder=new TextDecoder('utf-8',{fatal:true});
