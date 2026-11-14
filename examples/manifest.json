@@ -1,0 +1,31 @@
+{
+  "schema": "atto.demo.examples.v1",
+  "examples": [
+    {
+      "id": "scalar-42",
+      "path": "examples/scalar-42.atto",
+      "status": "candidate",
+      "execution": "not_executed_here",
+      "expected_return": 42,
+      "features": [
+        "int",
+        "val",
+        "arithmetic"
+      ],
+      "source_reference": "https://github.com/atto-lang/atto-lang.github.io/blob/main/index.html"
+    },
+    {
+      "id": "functions-and-stdio",
+      "path": "examples/functions-and-stdio.atto",
+      "status": "candidate",
+      "execution": "not_executed_here",
+      "expected_return": 42,
+      "features": [
+        "functions",
+        "stdio",
+        "int"
+      ],
+      "source_reference": "https://github.com/atto-lang/atto-lang.github.io/blob/main/play/examples/hello.atto"
+    }
+  ]
+}
