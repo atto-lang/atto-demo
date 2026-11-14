@@ -6,6 +6,10 @@ Introductory examples demonstrating AttoLang syntax, actors, and runtime feature
 
 Small examples for first-time AttoLang users.
 
+## Starter programs
+
+The [browser-subset starter programs](examples/README.md) supply `.atto` examples for integer arithmetic and function/stdio calls, with a machine-readable manifest and host-only structural regression tests. Execution is **not verified in this repository**. See the exact-receipt requirements before treating an expected return as a passing guest result.
+
 ## How to use these examples
 
 1. Check the repository contents for `.atto` examples and target-specific project manifests.
