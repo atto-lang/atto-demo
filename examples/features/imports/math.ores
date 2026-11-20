@@ -1,0 +1,7 @@
+namespace feature_sibling_import_math;
+
+define module math
+  pub fnc add(int left, int right) => int {
+    return left + right;
+  }
+end

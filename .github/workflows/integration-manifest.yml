@@ -1,0 +1,43 @@
+# Exact-head, source-only integration declaration check; no guest runtime.
+name: Integration manifest claims
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Validate exact checkout, integration contract and immutable source pin
+        shell: bash
+        env:
+          EXPECTED_DEMO_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_DEMO_SHA"
+          test -f .oreslang/integration.json
+          test ! -L .oreslang/integration.json
+          test -s .oreslang/integration.json
+          test -f SOURCE_REF
+          test ! -L SOURCE_REF
+          test "$(wc -l < SOURCE_REF)" -eq 1
+          test "$(wc -c < SOURCE_REF)" -eq 41
+          grep -Eq '^[0-9a-f]{40}$' SOURCE_REF
+          jq -e '
+            (.schemaVersion == 1) and
+            (.protocol == "oreslang-ecosystem-integration") and
+            (.repository == "ores-truffle-oreslang/oreslang-demo") and
+            (.role == "application") and
+            (.upstreams == ["oreslang-source.java"]) and
+            (.evidence == "not-attested") and
+            ((.note | type) == "string") and
+            (.note | ascii_downcase | contains("parity"))
+          ' .oreslang/integration.json
+          echo 'INTEGRATION_MANIFEST_PASS evidence=not-attested'
+          echo 'SOURCE_ONLY: no Oreslang compiler or guest executed'

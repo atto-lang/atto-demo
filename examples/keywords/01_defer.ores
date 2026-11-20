@@ -1,0 +1,19 @@
+namespace keyword_defer_demo;
+
+fnc compute() => int {
+  defer || -> {
+    stdio.stdout.write("A");
+  };
+
+  defer || -> {
+    stdio.stdout.write("B");
+  };
+
+  stdio.stdout.write("R");
+  return 7;
+}
+
+pub routine main() => void {
+  stdio.stdout.write(compute());
+  return;
+}
