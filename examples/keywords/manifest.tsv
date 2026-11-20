@@ -1,0 +1,14 @@
+# name	file	source_ref	mode	expected
+defer	examples/keywords/01_defer.ores	8ee99564cefc84197e50517aaac9e883f44d4eb5	run	RBA7
+recover	examples/keywords/02_recover.ores	b37075603307e759cd8c101c5e48fa36fb4bc841	run	DR7:D9
+lex-nlex	examples/keywords/03_lex_nlex.ores	8aad29181789dba5f598fb7351c6dedd205ef1b4	run	12:3:7
+invalid-lex-nlex	examples/keywords/11_invalid_lex_nlex.ores	8aad29181789dba5f598fb7351c6dedd205ef1b4	fail	cannot be combined
+gpu-contract	examples/keywords/04_gpu_contract.ores	14244a1ff90af49b8e245f90da1492f6a180815d	run	gpu-contract-ok
+gpu-no-cpu-fallback	examples/keywords/05_gpu_no_cpu_fallback.ores	14244a1ff90af49b8e245f90da1492f6a180815d	fail	never falls back to CPU
+actor-contract	examples/keywords/06_actor_contract.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	run	actor-contract-ok
+actor-no-caller-stack	examples/keywords/07_actor_no_caller_stack.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	fail	cannot execute on the caller stack
+async-await-contract	examples/keywords/08_async_await_contract.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	run	async-await-contract-ok
+async-no-sync-fallback	examples/keywords/09_async_no_sync_fallback.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	fail	refuses to run it synchronously
+invalid-async-actor	examples/keywords/10_invalid_async_actor.ores	2c6f4118c14bba6ec031265ebd2260895ca6516d	fail	mutually exclusive
+gc-contract	examples/keywords/12_gc_contract.ores	9359e049b316447134d2019e2135078af8eed9b6	run	gc-contract-ok
+private-actor-process-gc-denied	examples/keywords/13_private_actor_process_gc_denied.ores	9359e049b316447134d2019e2135078af8eed9b6	fail	PROCESS_GC
