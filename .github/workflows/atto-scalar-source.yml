@@ -1,0 +1,36 @@
+# Source-only identity gate, not guest execution.
+name: Canonical Atto scalar-source identity
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-scalar-blobs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Verify checked-out exact head
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          git diff --quiet
+          git diff --cached --quiet
+          echo "HEAD=$EXPECTED_SHA TREE=$(git rev-parse 'HEAD^{tree}')"
+      - name: Check new source-only script syntax
+        run: |
+          bash -n ci/check-atto-scalar-v1.sh
+          bash -n ci/test-atto-scalar-v1.sh
+          bash -n ci/run-atto-scalar-java.sh
+      - name: Run adversarial six-fixture source regressions
+        run: bash ci/test-atto-scalar-v1.sh
+      - name: Verify reviewed upstream byte identities
+        run: bash ci/check-atto-scalar-v1.sh
+      - name: Verify entire language source catalog
+        run: bash ci/check-semantic-coverage.sh

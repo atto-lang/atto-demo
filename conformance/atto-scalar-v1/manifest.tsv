@@ -1,0 +1,7 @@
+# id	kind	path	upstream_blob_sha1	expected_oracle
+canonical-add	positive	examples/atto/scalar-v1/positive/canonical-add.atto	015f8b0f79aafa796a148d2adeff1574e8d6c491	42
+precedence	positive	examples/atto/scalar-v1/positive/precedence.atto	50414e5e95c8007f066696f55aa75309555b83e2	14
+pure-call	positive	examples/atto/scalar-v1/positive/pure-call.atto	e5ab32f7d8f684d655a83a3df989f16c52090c05	42
+removed-modulo	negative	examples/atto/scalar-v1/negative/removed-modulo.atto	45d5794870e93074d9b11b90833a849e96aaa4c1	removed-operator
+removed-caret	negative	examples/atto/scalar-v1/negative/removed-caret.atto	6889c7e83c8d94b906fbfe78723caee9580da6aa	removed-operator
+type-first-reassignment	negative	examples/atto/scalar-v1/negative/type-first-reassignment.atto	b118f53e68565dcb9e6acd58deb8ee47dca67606	immutable-binding

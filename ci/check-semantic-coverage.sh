@@ -78,6 +78,14 @@ while IFS= read -r line || [[ -n "$line" ]]; do
     keyword)
       [[ "$path" == examples/keywords/* && -n "${manifest_modes[$path]+present}" && "${manifest_modes[$path]}" == "$mode" ]] || fail "keyword manifest mismatch: $id"
       ;;
+    atto-scalar)
+      [[ "$path" == examples/atto/scalar-v1/* ]] || fail "scalar scope: $id"
+      case "$path" in
+        examples/atto/scalar-v1/positive/*.atto) [[ "$mode" == run ]] || fail "positive scalar mode: $id" ;;
+        examples/atto/scalar-v1/negative/*.atto) [[ "$mode" == fail ]] || fail "negative scalar mode: $id" ;;
+        *) fail "invalid scalar path: $id" ;;
+      esac
+      ;;
     experimental)
       [[ "$path" == examples/experimental/* && "$mode" == excluded ]] || fail "experimental quarantine: $id"
       ;;

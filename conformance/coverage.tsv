@@ -49,3 +49,9 @@ keyword-invalid-async-actor	examples/keywords/10_invalid_async_actor.ores	keywor
 keyword-invalid-lex-nlex	examples/keywords/11_invalid_lex_nlex.ores	keyword	fail	invalid-lex-nlex	not-attested
 keyword-gc-contract	examples/keywords/12_gc_contract.ores	keyword	run	gc-contract	not-attested
 keyword-private-actor-process-gc-denied	examples/keywords/13_private_actor_process_gc_denied.ores	keyword	fail	private-actor-process-gc-denied	not-attested
+atto-scalar-canonical-add	examples/atto/scalar-v1/positive/canonical-add.atto	atto-scalar	run	scalar-canonical-add	not-attested
+atto-scalar-precedence	examples/atto/scalar-v1/positive/precedence.atto	atto-scalar	run	scalar-precedence	not-attested
+atto-scalar-pure-call	examples/atto/scalar-v1/positive/pure-call.atto	atto-scalar	run	scalar-pure-call	not-attested
+atto-scalar-removed-modulo	examples/atto/scalar-v1/negative/removed-modulo.atto	atto-scalar	fail	scalar-removed-modulo	not-attested
+atto-scalar-removed-caret	examples/atto/scalar-v1/negative/removed-caret.atto	atto-scalar	fail	scalar-removed-caret	not-attested
+atto-scalar-type-first-reassignment	examples/atto/scalar-v1/negative/type-first-reassignment.atto	atto-scalar	fail	scalar-type-first-reassignment	not-attested
