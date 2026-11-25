@@ -1,0 +1,21 @@
+define module app as
+  pub fnc main() => void {
+    val Option<int> some = Some(42);
+    stdio.println(some.is_some());
+    stdio.println(some.unwrap());
+
+    val Option<int> missing = None;
+    stdio.println(missing.is_none());
+
+    val Result<int, OptionUnwrapError> safe = missing.unwrap_safe();
+    stdio.println(safe.is_err());
+
+    val Result<int, String> ok = Ok(9);
+    val Result<int, String> preserved = ok.unwrap_safe();
+    stdio.println(preserved.is_ok());
+
+    stdio.println(Err("bad").unwrap_or(7));
+    stdio.println("option-example-ok");
+    return;
+  }
+end

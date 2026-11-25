@@ -1,14 +1,52 @@
-# AttoLang starter examples
+# Runnable examples
 
-The [manifest](manifest.json) lists two small `.atto` guest-program candidates targeting the documented browser compiler subset:
+Every top-level `.ores` file in this directory is executed by `scripts/run-all.sh`.
 
-| File | Goal | Expected return | Execution in this repository |
-| --- | --- | --- | --- |
-| [scalar-42.atto](scalar-42.atto) | Integer arithmetic | 42 | **Not executed here** |
-| [functions-and-stdio.atto](functions-and-stdio.atto) | Functions, basic stdio, return value | 42 | **Not executed here** |
+| Example | Focus |
+| --- | --- |
+| `00_hello.ores` | minimal file-level `routine main` |
+| `01_modules_namespaces_callables.ores` | namespaces, modules, recursive `fnc`, lexical lambda |
+| `02_structural_types.ores` | explicit structural parameters, objects, arrays, tuples, complex numbers |
+| `03_classes_and_methods.ores` | classes, receiver methods, `self` |
+| `04_control_flow.ores` | `if/then/elif/else/fi`, conventional loops |
+| `05_ownership_and_borrows.ores` | affine move semantics, `mut` owned parameters, `&mut` borrows |
+| `06_closures_and_recursive_lambdas.ores` | escaping mutable closure state, explicitly typed recursive lambda |
+| `07_iterators_and_scheduler_safepoints.ores` | `for ... of`, `Symbol.iterator`, scheduler cooperation |
+| `08_typed_returns_and_destructuring.ores` | finite tuple types, record types, typed return destructuring |
+| `09_destructure_discards.ores` | reusable `_` discard patterns |
+| `10_inheritance_and_collections.ores` | inheritance, modules, mutable locals, arrays and objects |
+| `11_generics_and_inference.ores` | generic functions/classes, explicit and inferred type arguments, nested generics |
+| `12_generic_inheritance.ores` | generic interfaces, inherited generic fields/methods, concrete substitution |
+| `13_logical_operators.ores` | `&&`, `||`, `^^`, precedence and short-circuit behavior |
+| `14_bitwise_operators.ores` | `~`, `&`, `|`, `^`, `<<`, `>>`, `>>>` |
 
-The `expected_return` field is a test **expectation**, not a passing guest receipt. These examples derive from canonical published site source. To claim executable support, record the compiler source SHA, vendored Wasm SHA-256, generated guest SHA-256, host/runtime, actual return value and stdout, and a reproducible exact-head CI run. A Node catalog test only checks source and manifest structure.
+These are executable examples, not syntax sketches. The compiler/runtime revision used by default is pinned in the repository root `SOURCE_REF`.
 
-Run host-only checks with `node --test tests/*.test.mjs`.
+## Experimental keyword contracts
 
-For independently executed guest evidence, build a pinned Rust `attoc` binary from `atto-lang/atto-source.rs` and run `ATTOC=/absolute/path/to/attoc ATTO_COMPILER_HEAD=<exact-40-character-commit-SHA> node tests/guest-execution.mjs` from this repository. That separate test compiles each checked-in program to Wasm, executes `main` with an allowlisted Node WebAssembly host, checks return values and stdio, verifies the guest SHA-256, and requires an invalid source to produce no Wasm artifact. A successful run establishes **only the pinned compiler's supported guest subset**, not backend parity or general actor semantics. Try the actual compiler at [AttoLang Playground](https://atto-lang.github.io/play/) but do not equate browser preview output with native multi-backend parity.
+The `keywords/` subdirectory is intentionally excluded from the normal top-level glob used by `run-all.sh`. Those examples are pinned to feature-specific source commits and are run through:
+
+```bash
+bash scripts/run-keyword-demos.sh
+```
+
+See `keywords/README.md` and `../docs/keyword-contracts.md`.
+
+
+## Feature-specific language matrix
+
+Newer language contracts that span stacked compiler branches live under
+`features/`. They are pinned per example and run with:
+
+```bash
+bash scripts/run-feature-demos.sh
+```
+
+That matrix covers async/await, actors, sibling imports, callable-local
+interfaces, defer/recover, Option/Result extraction, ownership intrinsics,
+trait/class/struct/interface boundaries, static members, destructuring, and
+`mut/is/as/with`. See `features/README.md` for the exact semantic boundaries.
+
+## Browser starter candidates (not executed here)
+
+The [manifest](manifest.json) records two additional preview programs, [scalar-42](scalar-42.atto) and [functions-and-stdio](functions-and-stdio.atto). Both expect exit value 42; these expectations are not guest receipts. Run `node --test tests/examples.test.mjs` from the repository root for host catalog checks. Actual execution requires a pinned compiler and guest identity, runtime and observed outputs.

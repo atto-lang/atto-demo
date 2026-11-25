@@ -1,14 +1,16 @@
+> **AI agent instructions (organization-wide):** Before working on code, issues, or pull requests, read and follow the [organization `AGENTS.md`](https://github.com/atto-lang/.github/blob/main/AGENTS.md), including its **merge-first stealth-development policy**. Honor any repository-local `AGENTS.md`, explicit holds, and GitHub-enforced rules.
+
 # atto-demo
 
 Introductory examples demonstrating AttoLang syntax, actors, and runtime features.
 
+## Naming migration and language authority
+
+This repository is maintained at [atto-lang/atto-demo](https://github.com/atto-lang/atto-demo); use `https://github.com/atto-lang/atto-demo.git` for Git remotes and canonical `.atto` source examples. The normative language contract is [atto-spec](https://github.com/atto-lang/atto-spec), with executable guest evidence tracked by [atto-platform-conformance](https://github.com/atto-lang/atto-platform-conformance). Follow current ownership, borrowing, effects, actor, and syntax rules there; do not infer implemented features from a README or unexecuted CI.
+
 ## What this project explores
 
 Small examples for first-time AttoLang users.
-
-## Starter programs
-
-The [browser-subset starter programs](examples/README.md) supply `.atto` examples for integer arithmetic and function/stdio calls, with a machine-readable manifest and host-only structural regression tests. Execution is **not verified in this repository**. See the exact-receipt requirements before treating an expected return as a passing guest result.
 
 ## How to use these examples
 
@@ -26,3 +28,27 @@ These examples are intended to demonstrate AttoLang concepts. Examples may depen
 - [AttoLang repositories](https://github.com/atto-lang)
 - [Canonical language specification](https://github.com/atto-lang/atto-spec)
 - [Backend conformance](https://github.com/atto-lang/atto-platform-conformance)
+
+## Repository ownership and contribution routing
+
+**Belongs here:** Small first-run AttoLang programs showcasing syntax, compilation and basic actor behavior with minimal dependencies.
+
+**Belongs elsewhere:** Multi-application gallery in atto-demos; unstable exploratory prototypes in atto-proof-of-concepts; full server reference in atto-demo-restful-server.
+
+**Security and portability boundary:** Keep examples executable on a named backend and pinned revision, record expected output and diagnostics, and avoid claiming all targets support each example.
+
+AttoLang is the canonical project name; new source, examples and documentation use `.atto` and the `atto-lang` repository organization. This README defines scope, not feature readiness.
+
+**Acceptance:** name exact source SHA/tree, runtime/toolchain, positive and negative checks and execution receipt before claiming support. Host-only tests and empty CI steps do not prove guest execution.
+
+## Legacy migration and verification gates
+
+The historical predecessor was `ores-truffle-oreslang/oreslang-demo`. This repository is now maintained in `atto-lang`; a similarly named repository or imported history does not by itself establish preservation of the original numeric repository ID, source parity or compiler support. Preserve working legacy `.ores` inputs, old package names and CLI references until compatibility and replacement paths have been verified; new source follows the canonical `.atto` specification.
+
+Small canonical end-to-end examples need pinned compiler execution receipts; runtime implementations and managed hosting guarantees belong elsewhere. [atto-lang](https://github.com/atto-lang) owns language, tooling and portable examples/libraries; [atto-co](https://github.com/atto-co) owns separately governed hosted deployment, tenant infrastructure, registry, identity and billing. Any further original-ID transfer or managed-product carve-out requires separate owner authorization; no direct legacy-org move to atto-co is authorized by this document.
+
+Before an actual transfer, coordinate with the [migration issue](https://github.com/ores-truffle-oreslang/.github/issues/26) and authorized reviewers; inventory numeric ID, exact HEAD/tree, history, access, branch protections/rulesets, open PRs, packages, releases, CI/runners, secrets, webhooks, apps, Pages, dependencies and rollback ownership. Never disclose or mirror private code without authorization. After transfer, verify ID/tree/history and security controls, then execute exact-head tests before changing consumer references. Empty CI steps are NOT_EXECUTED; host-only checks are not compiled guest evidence.
+
+## Browser starter candidates
+
+See [examples](examples/README.md) for two browser-subset `.atto` starter programs and the candidate manifest. Host catalog tests do not establish guest execution.

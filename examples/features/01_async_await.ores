@@ -1,0 +1,19 @@
+namespace feature_async_await;
+
+pub async fnc fetch_answer() => int {
+  return 42;
+}
+
+pub async fnc collect_answer() => int {
+  return await fetch_answer();
+}
+
+fnc type_contract() => void {
+  val Future<int> pending = fetch_answer();
+  return;
+}
+
+pub routine main() => void {
+  stdio.println("async-await-example-ok");
+  return;
+}

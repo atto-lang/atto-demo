@@ -1,0 +1,27 @@
+namespace keyword_capture_demo;
+
+fnc make_constant() => (() -> int) {
+  return nlex || -> {
+    return 7;
+  };
+}
+
+pub routine main() => void {
+  val int base = 10;
+
+  val Fnc<int, int> captured = lex |int x| -> {
+    return x + base;
+  };
+
+  val Fnc<int, int> isolated = nlex |int x| -> {
+    val int local = 1;
+    return x + local;
+  };
+
+  stdio.stdout.write(captured(2));
+  stdio.stdout.write(":");
+  stdio.stdout.write(isolated(2));
+  stdio.stdout.write(":");
+  stdio.stdout.write(make_constant()());
+  return;
+}

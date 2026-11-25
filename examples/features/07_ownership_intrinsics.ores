@@ -1,0 +1,43 @@
+define class Buffer as
+  pub let int value = 0;
+
+  pub copy() => Buffer {
+    return new Buffer(self.value);
+  }
+end
+
+struct Point {
+  x: int;
+  y: int;
+}
+
+fnc inspect(&Buffer value) => int {
+  return value.value;
+}
+
+fnc consume(Buffer value) => int {
+  return value.value;
+}
+
+fnc sum(Point value) => int {
+  return value.x + value.y;
+}
+
+pub routine main() => void {
+  let Buffer original = new Buffer(7);
+  let Buffer duplicate = copy(original);
+
+  stdio.stdout.write(inspect(borrow(original)));
+
+  val &Buffer shared = share(original);
+  original.value = 9;
+
+  stdio.stdout.write(inspect(shared));
+  stdio.stdout.write(original.value);
+  stdio.stdout.write(consume(take(duplicate)));
+
+  let Point point = Point { x = 2, y = 3 };
+  stdio.stdout.write(sum(copy(point)));
+  stdio.stdout.write(point.x);
+  return;
+}
