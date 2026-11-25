@@ -48,3 +48,7 @@ The historical predecessor was `ores-truffle-oreslang/oreslang-demo`. This repos
 Small canonical end-to-end examples need pinned compiler execution receipts; runtime implementations and managed hosting guarantees belong elsewhere. [atto-lang](https://github.com/atto-lang) owns language, tooling and portable examples/libraries; [atto-co](https://github.com/atto-co) owns separately governed hosted deployment, tenant infrastructure, registry, identity and billing. Any further original-ID transfer or managed-product carve-out requires separate owner authorization; no direct legacy-org move to atto-co is authorized by this document.
 
 Before an actual transfer, coordinate with the [migration issue](https://github.com/ores-truffle-oreslang/.github/issues/26) and authorized reviewers; inventory numeric ID, exact HEAD/tree, history, access, branch protections/rulesets, open PRs, packages, releases, CI/runners, secrets, webhooks, apps, Pages, dependencies and rollback ownership. Never disclose or mirror private code without authorization. After transfer, verify ID/tree/history and security controls, then execute exact-head tests before changing consumer references. Empty CI steps are NOT_EXECUTED; host-only checks are not compiled guest evidence.
+
+## Browser starter candidates
+
+See [examples](examples/README.md) for two browser-subset `.atto` starter programs and the candidate manifest. Host catalog tests do not establish guest execution.

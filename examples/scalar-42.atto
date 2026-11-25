@@ -1,0 +1,6 @@
+// AttoLang browser-subset candidate: arithmetic return-value smoke.
+// Actual execution must be proven by an exact compiler SHA and guest receipt.
+pub fnc main(): int {
+  val x: int = 6;
+  return x * 7;
+}

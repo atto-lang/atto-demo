@@ -46,3 +46,7 @@ That matrix covers async/await, actors, sibling imports, callable-local
 interfaces, defer/recover, Option/Result extraction, ownership intrinsics,
 trait/class/struct/interface boundaries, static members, destructuring, and
 `mut/is/as/with`. See `features/README.md` for the exact semantic boundaries.
+
+## Browser starter candidates (not executed here)
+
+The [manifest](manifest.json) records two additional preview programs, [scalar-42](scalar-42.atto) and [functions-and-stdio](functions-and-stdio.atto). Both expect exit value 42; these expectations are not guest receipts. Run `node --test tests/examples.test.mjs` from the repository root for host catalog checks. Actual execution requires a pinned compiler and guest identity, runtime and observed outputs.
