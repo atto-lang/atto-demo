@@ -54,6 +54,9 @@ for arg in "$@"; do
       ;;
   esac
 done
+if [[ "${MUTATE_SOURCE_ON_COMPILE:-0}" == 1 && "${*: -1}" == compile ]]; then
+  printf '<!-- unexpected compiler source change -->\n' >> "$SOURCE_REPO_TO_MUTATE/pom.xml"
+fi
 MVN
 chmod +x "$bin_dir/mvn"
 
@@ -180,5 +183,133 @@ if (
   exit 1
 fi
 rm "$demo/examples/new.ores"
+
+# This harness uses a fake Maven executable only to test runner admission.
+# A matching printed HEAD is not sufficient evidence of compiled guest behavior.
+expect_source_rejection() {
+  local scenario="$1" diagnostic="$2"
+  shift 2
+  local before result
+  before="$(wc -l < "$mvn_log")"
+  if result="$(
+    cd "$demo"
+    PATH="$bin_dir:$PATH" MVN_LOG="$mvn_log" "$@" 2>&1
+  )"; then
+    echo "runner source-policy false acceptance: $scenario" >&2
+    exit 1
+  fi
+  if [[ "$result" != *"$diagnostic"* ]]; then
+    echo "runner rejected $scenario for wrong reason; expected $diagnostic" >&2
+    printf '%s\n' "$result" >&2
+    exit 1
+  fi
+  if [[ "$(wc -l < "$mvn_log")" != "$before" ]]; then
+    echo "runner invoked Maven before rejecting source: $scenario" >&2
+    exit 1
+  fi
+  echo "SOURCE_REJECTION_VERIFIED=$scenario"
+}
+
+# A caller-specified source directory must not bypass the exact SHA pin.
+expect_source_rejection explicit-wrong-head 'selected HEAD differs from SOURCE_REF' \
+  env ORESLANG_SOURCE_DIR="$source_repo" bash scripts/run.sh examples/00_one.ores
+expect_source_rejection malformed-override 'invalid source revision' \
+  env ORESLANG_SOURCE_REF_OVERRIDE='--version' bash scripts/run.sh examples/00_one.ores
+expect_source_rejection short-override 'invalid source revision' \
+  env ORESLANG_SOURCE_REF_OVERRIDE=abcd bash scripts/run.sh examples/00_one.ores
+
+# Valid explicit checkout remains supported when it is exact-head and clean.
+valid_explicit="$(
+  cd "$demo"
+  PATH="$bin_dir:$PATH" MVN_LOG="$mvn_log" \
+    ORESLANG_SOURCE_DIR="$demo/.cache/oreslang-source.java" \
+    bash scripts/run.sh examples/00_one.ores
+)"
+case "$valid_explicit" in
+  *"ATTO_DEMO_CLEAN_HEAD_MATCH=$pinned_ref"*"output:00_one.ores"*"PASS"*) ;;
+  *) echo "runner broke legitimate exact-head explicit checkout" >&2; exit 1 ;;
+esac
+
+# Caller-controlled Git variables must not redirect the source audit to a
+# fake .git directory, index, or injected fsmonitor configuration.
+valid_poisoned_environment="$(
+  cd "$demo"
+  PATH="$bin_dir:$PATH" MVN_LOG="$mvn_log" \
+    GIT_DIR="$tmp_root/missing-fake-git-dir" \
+    GIT_INDEX_FILE="$tmp_root/forged-index" \
+    GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.fsmonitor GIT_CONFIG_VALUE_0=true \
+    ORESLANG_SOURCE_DIR="$demo/.cache/oreslang-source.java" \
+    bash scripts/run.sh examples/00_one.ores
+)"
+case "$valid_poisoned_environment" in
+  *"ATTO_DEMO_CLEAN_HEAD_MATCH=$pinned_ref"*"output:00_one.ores"*"PASS"*) ;;
+  *) echo "caller Git environment redirected pinned source verification" >&2; exit 1 ;;
+esac
+
+# Neither tracked modifications nor new files may be laundered through the
+# explicit-directory path. Both must reject *before* fake Maven is invoked.
+cache="$demo/.cache/oreslang-source.java"
+printf '<!-- altered -->\n' >> "$cache/pom.xml"
+expect_source_rejection explicit-dirty-tracked 'dirty source checkout' \
+  env ORESLANG_SOURCE_DIR="$cache" bash scripts/run.sh examples/00_one.ores
+git -C "$cache" checkout -- pom.xml
+printf 'untracked source\n' > "$cache/rogue.atto"
+expect_source_rejection explicit-dirty-untracked 'dirty source checkout' \
+  env ORESLANG_SOURCE_DIR="$cache" bash scripts/run.sh examples/00_one.ores
+rm "$cache/rogue.atto"
+
+# SOURCE_REF itself must be a regular one-line file, not a symlink or a
+# whitespace-normalized value that transforms arbitrary input into a SHA.
+printf '%s  \n' "$pinned_ref" > "$demo/SOURCE_REF"
+expect_source_rejection padded-ref 'invalid SOURCE_REF' \
+  bash scripts/run.sh examples/00_one.ores
+printf '%s\n' "$pinned_ref" > "$demo/SOURCE_REF"
+mv "$demo/SOURCE_REF" "$demo/SOURCE_REF.pinned"
+ln -s SOURCE_REF.pinned "$demo/SOURCE_REF"
+expect_source_rejection symlink-ref 'invalid SOURCE_REF' \
+  bash scripts/run.sh examples/00_one.ores
+rm "$demo/SOURCE_REF"
+mv "$demo/SOURCE_REF.pinned" "$demo/SOURCE_REF"
+
+# A matching adjacent HEAD but modified compiler file must not satisfy pin.
+git -C "$source_repo" checkout --quiet --detach "$pinned_ref"
+printf '<!-- sibling dirty -->\n' >> "$source_repo/pom.xml"
+expect_source_rejection adjacent-dirty-tracked 'dirty source checkout' \
+  bash scripts/run.sh examples/00_one.ores
+git -C "$source_repo" checkout -- pom.xml
+git -C "$source_repo" checkout --quiet --detach "$sibling_head"
+
+# A Git-ignored generated Atto source under src/ still affects a compiler
+# input path. Ordinary 'git status' misses it, but the source inventory must not.
+mkdir -p "$cache/src"
+printf 'src/ignored.atto\n' >> "$cache/.git/info/exclude"
+printf 'ignored guest source\n' > "$cache/src/ignored.atto"
+expect_source_rejection explicit-ignored-source 'dirty source checkout' \
+  env ORESLANG_SOURCE_DIR="$cache" bash scripts/run.sh examples/00_one.ores
+rm -f "$cache/src/ignored.atto"
+rmdir "$cache/src"
+: > "$cache/.git/info/exclude"
+
+# Mutations between Maven compile and exec must be caught by a *second*
+# identity validation, not only by the initial command's SOURCE_REF check.
+before_recheck="$(wc -l < "$mvn_log")"
+if late_result="$(
+  cd "$demo"
+  PATH="$bin_dir:$PATH" MVN_LOG="$mvn_log" \
+    MUTATE_SOURCE_ON_COMPILE=1 SOURCE_REPO_TO_MUTATE="$cache" \
+    ORESLANG_SOURCE_DIR="$cache" \
+    bash scripts/run.sh examples/00_one.ores 2>&1
+)"; then
+  echo "runner executed after source was modified between build and exec" >&2
+  exit 1
+fi
+if [[ "$late_result" != *'dirty source checkout'* ]] ||
+   [[ "$(wc -l < "$mvn_log")" -ne $(( before_recheck + 1 )) ]]; then
+  echo "runner failed late mutation admission check or invoked guest Maven" >&2
+  printf '%s\n' "$late_result" >&2
+  exit 1
+fi
+git -C "$cache" checkout -- pom.xml
+echo "SOURCE_REJECTION_VERIFIED=postcompile-mutation"
 
 echo "runner self-test passed"
